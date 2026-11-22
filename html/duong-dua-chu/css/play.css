@@ -1,0 +1,90 @@
+/* ---------- cảnh đua ---------- */
+.scene{position:relative;height:clamp(170px,30vh,290px);border-radius:28px;overflow:hidden;background:linear-gradient(var(--sky1),var(--sky2) 70%);box-shadow:0 8px 0 var(--scsh);--cw:clamp(86px,14vw,132px)}
+.sun{position:absolute;left:6%;top:10%;width:64px;height:64px;border-radius:50%;background:var(--sunc);box-shadow:0 0 0 12px var(--sunr),0 0 40px var(--sung)}
+.cloud{position:absolute;height:28px;width:90px;background:var(--cloud);border-radius:30px;opacity:.95;animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud::before{width:44px;height:44px;left:14px;top:-20px}.cloud::after{width:34px;height:34px;left:46px;top:-14px}
+@keyframes drift{from{transform:translateX(-140px)}to{transform:translateX(110vw)}}
+.hills{position:absolute;left:0;right:0;bottom:30%;width:100%;height:46%}
+.grass{position:absolute;left:0;right:0;bottom:30%;height:6%;background:#5cc44a}
+.road{position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(#5b5f6b,#454852);border-top:6px solid #fff}
+.road::after{content:"";position:absolute;left:0;right:0;top:46%;height:6px;background:repeating-linear-gradient(90deg,#fff 0 34px,transparent 34px 64px)}
+.gate{position:absolute;right:5%;bottom:6%;width:22px;height:74%}
+.gate .pole{position:absolute;bottom:0;width:8px;height:100%;background:#fff;border-radius:4px;box-shadow:inset -3px 0 0 #ccd}
+.gate .flag{position:absolute;top:0;left:8px;width:64px;height:40px;background:repeating-conic-gradient(#222 0 25%,#fff 0 50%) 0 0/16px 16px;border-radius:0 6px 6px 0;transform-origin:left;animation:wave 1.2s ease-in-out infinite alternate}
+.gate .label{position:absolute;top:44px;left:-8px;font:800 15px "Baloo 2",sans-serif;background:var(--red);color:#fff;padding:0 8px;border-radius:8px}
+@keyframes wave{to{transform:skewY(6deg) scaleX(.92)}}
+.finishline{position:absolute;right:calc(5% + 4px);bottom:0;width:16px;height:30%;background:repeating-conic-gradient(#222 0 25%,#fff 0 50%) 0 0/16px 16px}
+.star{position:absolute;bottom:9%;width:22px;height:22px;transform:translateX(-50%);transition:transform .4s}
+.star path{fill:var(--starf);stroke:#ffc928;stroke-width:2}
+.star.got path{fill:#ffc928}
+.star.got{transform:translateX(-50%) scale(1.3)}
+.car{position:absolute;bottom:7%;width:var(--cw);left:calc(3% + (88% - var(--cw)) * var(--p,0));transition:left .9s cubic-bezier(.3,1.4,.5,1);color:var(--carc,#ff4d4d);filter:drop-shadow(0 6px 0 rgba(0,0,0,.2))}
+.car svg,.gcar svg{display:block;width:100%;height:auto;overflow:visible}
+.car.moving .wheel{animation:spin .3s linear infinite}
+.wheel{transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.car.moving{animation:bump .25s ease-in-out infinite alternate}
+@keyframes bump{to{transform:translateY(-3px)}}
+.puff{position:absolute;bottom:14%;width:18px;height:18px;border-radius:50%;background:#fff;opacity:0;pointer-events:none}
+.car.moving~.puff{animation:puff .6s ease-out infinite}
+@keyframes puff{from{opacity:.8;transform:scale(.5)}to{opacity:0;transform:translateX(-40px) scale(1.6)}}
+.badge{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.88);color:#1f2a44;border-radius:16px;padding:4px 12px;font:800 18px "Baloo 2",sans-serif;display:flex;gap:12px}
+
+/* ---------- màn chơi ---------- */
+.card{background:var(--card);border-radius:28px;padding:16px 18px;border:3px solid var(--line)}
+.stage{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.stage .buddy{align-self:stretch}
+.stageBody{width:100%;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.cue{color:var(--soft);font-weight:800;font-size:17px}
+.big{font:800 clamp(60px,13vw,110px)/1.05 "Baloo 2",sans-serif;color:var(--blue);padding:8px 26px 0;border-radius:26px;background:var(--bigbg);min-width:2.2em;max-width:100%;overflow-wrap:anywhere}
+.big.ok{color:var(--green);animation:pop .45s}
+.big.miss{color:var(--red)}
+.no{animation:shake .4s}
+@keyframes pop{50%{transform:scale(1.15)}}
+@keyframes shake{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.sent{font:800 clamp(30px,6vw,54px)/1.35 "Baloo 2",sans-serif;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;padding:6px 12px;border-radius:24px;background:var(--bigbg);max-width:100%}
+.sent span{padding:0 6px;border-radius:12px;transition:background .25s,color .25s}
+.sent .done{color:var(--green)}
+.sent .cur{background:var(--sun);color:#3a2a00}
+.sent .blank{display:inline-block;min-width:2.6em;border-bottom:6px dashed var(--purple);color:var(--purple);text-align:center}
+.sent .filled{color:var(--purple)}
+.sent .filled.pop{animation:pop .5s}
+.choices{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.chip{font:800 clamp(30px,6vw,46px)/1.1 "Baloo 2",sans-serif;padding:10px 26px 4px;border-radius:22px;background:var(--card);border:4px solid var(--purple);box-shadow:0 7px 0 var(--purple);min-width:130px;min-height:76px;color:var(--ink)}
+.chip:active{transform:translateY(4px);box-shadow:0 3px 0 var(--purple)}
+.chip.wrong,.balloon.wrong{animation:shake .4s;opacity:.35}
+/* bóng bay */
+.balloons{display:flex;gap:clamp(14px,4vw,44px);justify-content:center;flex-wrap:wrap;padding:6px 0 50px}
+.balloon{position:relative;width:clamp(116px,23vw,160px);height:clamp(136px,27vw,190px);border-radius:50% 50% 48% 48%/56% 56% 44% 44%;background:var(--bc);color:#fff;font:800 clamp(28px,5.4vw,42px)/1 "Baloo 2",sans-serif;text-shadow:0 2px 0 rgba(0,0,0,.3);box-shadow:inset -12px -16px 0 rgba(0,0,0,.14),inset 10px 10px 0 rgba(255,255,255,.18);animation:float 2.6s ease-in-out infinite alternate;animation-delay:var(--d,0s);padding:0 8px}
+.balloon::before{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-8px;border:8px solid transparent;border-bottom:10px solid var(--bc);border-top:0}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;margin-top:1px;width:2px;height:44px;background:var(--soft)}
+.balloon.pop{animation:popb .45s forwards}
+@keyframes float{from{transform:translateY(-6px) rotate(-3deg)}to{transform:translateY(8px) rotate(3deg)}}
+@keyframes popb{to{transform:scale(1.6);opacity:0}}
+/* đọc nhanh */
+.fuse{width:min(440px,82vw);height:24px;border-radius:99px;background:var(--wbg);overflow:hidden;border:3px solid var(--line)}
+.fuse i{display:block;height:100%;width:100%;background:var(--green);border-radius:99px;transition:background .3s}
+.fuse.warn i{background:var(--orange)}
+.fuse.hot i{background:var(--red)}
+.qicon{font-size:72px;line-height:1}
+.qready p{font:700 20px Nunito,sans-serif;margin:6px 0 14px}
+.go{min-height:76px;padding:0 44px;border-radius:26px;background:var(--orange);color:#fff;font:800 32px "Baloo 2",sans-serif;box-shadow:0 8px 0 #c97700;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.go:active{transform:translateY(5px);box-shadow:0 3px 0 #c97700}
+/* nút điều khiển */
+.controls{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+.mic{width:100px;height:100px;border-radius:50%;background:var(--red);color:#fff;box-shadow:0 7px 0 #c62f2f;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.mic:active{transform:translateY(4px);box-shadow:0 3px 0 #c62f2f}
+.mic.on{background:var(--green);box-shadow:0 7px 0 #1d8a41;animation:ring 1.2s infinite}
+@keyframes ring{0%{box-shadow:0 7px 0 #1d8a41,0 0 0 0 rgba(47,179,90,.55)}100%{box-shadow:0 7px 0 #1d8a41,0 0 0 24px rgba(47,179,90,0)}}
+.round{min-height:60px;padding:0 18px;border-radius:20px;background:var(--rbg);font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px;box-shadow:0 5px 0 var(--rsh)}
+.round:active{transform:translateY(3px);box-shadow:0 2px 0 var(--rsh)}
+.round.hint{animation:pop .8s 3}
+.round.parent{background:var(--pbg);box-shadow:0 5px 0 var(--psh)}
+.heard{min-height:1.5em;color:var(--soft);font-weight:700}
+.mode{display:inline-block;font-size:14px;font-weight:800;padding:2px 10px;border-radius:999px;background:var(--mbg);color:var(--soft)}
+.strip{margin-top:18px}
+.words{display:flex;flex-wrap:wrap;gap:8px;font:700 22px "Baloo 2",sans-serif;line-height:1.2}
+.w{padding:4px 10px;border-radius:12px;background:var(--wbg);transition:background .3s}
+.w.done{background:var(--dbg);color:var(--dink)}
+.w.cur{background:var(--sun);color:#3a2a00}

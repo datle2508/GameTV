@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đường đua chữ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/play.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <button class="ib" id="homeBtn" aria-label="Về trang chủ" style="visibility:hidden">🏠</button>
+  <h1 class="logo">Đường đua <span>chữ</span></h1>
+  <button class="pill" id="starsBtn" aria-label="Sao của bé, mở gara xe">⭐ <b id="totalStars">0</b></button>
+  <button class="ib" id="parentBtn" aria-label="Góc bố mẹ">👪</button>
+</header>
+
+<!-- ========== TRANG CHỦ ========== -->
+<section class="screen on" id="home">
+  <div class="buddy hero">
+    <svg class="face" id="buddyHome" viewBox="0 0 60 60" aria-hidden="true"></svg>
+    <div class="bubble" id="heroMsg">Chào bé! Hôm nay mình chơi trò gì nào?</div>
+    <button class="say" id="heroSay" aria-label="Nghe lời chào">🔊</button>
+  </div>
+  <h2 class="sec">Chọn trò chơi</h2>
+  <div class="modes" id="modes"></div>
+  <div class="extras">
+    <button class="bigBtn" id="garageBtn"><span class="e">🚗</span><span>Gara xe<small>Chọn xe, mở khoá xe mới</small></span></button>
+    <button class="bigBtn" id="newBtn"><span class="e">✏️</span><span>Tạo bài mới<small>Bố mẹ và bé tự soạn bài đọc</small></span></button>
+  </div>
+</section>
+
+<!-- ========== CHỌN BÀI ========== -->
+<section class="screen" id="pick">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi" id="pickIcon"></span>
+    <div class="grow"><h2 id="pickTitle"></h2><small id="pickDesc"></small></div>
+    <button class="say" id="pickSay" aria-label="Nghe hướng dẫn">🔊</button>
+  </div>
+  <div class="lessonGrid" id="lessonGrid"></div>
+</section>
+
+<!-- ========== CHƠI ========== -->
+<section class="screen" id="play">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại chọn bài">⬅️</button>
+    <div class="grow"><h2 id="pLesson"></h2><small id="pMode"></small></div>
+  </div>
+  <div class="scene">
+    <div class="sun"></div>
+    <div class="cloud" style="top:14%;animation-duration:38s;animation-delay:-8s"></div>
+    <div class="cloud" style="top:28%;animation-duration:52s;animation-delay:-30s;width:64px;height:20px"></div>
+    <div class="cloud" style="top:8%;animation-duration:64s;animation-delay:-50s"></div>
+    <svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 200 L0 120 Q120 30 260 110 T520 90 T800 70 T1000 100 L1000 200Z" fill="#9be07a" style="fill:var(--hill1)"/>
+      <path d="M0 200 L0 160 Q180 90 360 150 T700 130 T1000 150 L1000 200Z" fill="#6fcf55" style="fill:var(--hill2)"/>
+      <g fill="#2e9e48" style="fill:var(--tree)"><circle cx="150" cy="128" r="22"/><circle cx="430" cy="140" r="18"/><circle cx="640" cy="118" r="24"/><circle cx="880" cy="136" r="20"/></g>
+    </svg>
+    <div class="grass"></div>
+    <div class="road"></div>
+    <div class="finishline"></div>
+    <div class="gate"><div class="pole"></div><div class="flag"></div><div class="label">ĐÍCH</div></div>
+    <div id="roadStars"></div>
+    <div class="car" id="car"></div>
+    <div class="puff" id="puff"></div>
+    <div class="badge"><span id="score">0/0</span><span id="clock">0:00</span></div>
+  </div>
+
+  <section class="card stage">
+    <div class="buddy">
+      <svg class="face" id="buddyPlay" viewBox="0 0 60 60" aria-hidden="true"></svg>
+      <div class="bubble" id="msg" aria-live="polite"></div>
+    </div>
+    <div class="stageBody" id="stageBody"></div>
+    <div class="controls">
+      <button class="round" id="listen" aria-label="Nghe đọc mẫu">🔊 <span id="listenTxt">Nghe mẫu</span></button>
+      <button class="mic" id="mic" data-primary aria-label="Bật micro để đọc">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/></svg>
+      </button>
+      <button class="round parent" id="ok" data-primary aria-label="Bố mẹ chấm đúng">✔️ Bố mẹ chấm đúng</button>
+    </div>
+    <div class="heard" id="heard"></div>
+    <span class="mode" id="micmode">Đang kiểm tra micro…</span>
+  </section>
+  <section class="card strip" id="strip"><div class="words" id="words"></div></section>
+</section>
+
+<!-- ========== SOẠN BÀI ========== -->
+<section class="screen" id="editor">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">✏️</span>
+    <div class="grow"><h2 id="edHead">Tạo bài mới</h2><small>Bài lưu trên máy này</small></div>
+  </div>
+  <div class="card form">
+    <label class="fl">Tên bài
+      <input id="edName" maxlength="30" placeholder="Ví dụ: Con mèo nhà em" autocomplete="off">
+    </label>
+    <div class="fl">Hình cho bài<div class="icons" id="edIcons"></div></div>
+    <label class="fl">Đoạn văn cho bé đọc
+      <textarea id="edText" maxlength="800" placeholder="Nhà em có con mèo. Mèo có bộ lông mềm. Mèo thích nằm sưởi nắng."></textarea>
+    </label>
+    <div class="tips">💡 Mỗi câu kết thúc bằng dấu chấm. Câu ngắn 4–8 từ, dùng từ bé đã học. Vừa sức: 3–6 câu.</div>
+    <div class="preview" id="edPreview"></div>
+    <div class="btnRow">
+      <button class="btn green" id="edSave">💾 Lưu bài</button>
+      <button class="btn ghost" id="edHear">🔊 Nghe thử</button>
+      <button class="btn red" id="edDel">🗑 Xoá bài</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== GARA ========== -->
+<section class="screen" id="garage">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">🚗</span>
+    <div class="grow"><h2>Gara xe của bé</h2><small>Gom sao để mở khoá xe mới</small></div>
+  </div>
+  <div class="garageGrid" id="garageGrid"></div>
+  <p class="nextUnlock" id="garageNext"></p>
+</section>
+
+<!-- ========== BỐ MẸ ========== -->
+<section class="screen" id="parent">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">👪</span>
+    <div class="grow"><h2>Góc bố mẹ</h2><small id="pMic"></small><small id="pVoice"></small></div>
+  </div>
+  <div class="card">
+    <div class="setGroup">
+      <h3>🤖 Giọng AI của Google (đọc chuẩn dấu)</h3>
+      <div id="gStatus" class="note"></div>
+      <div class="btnRow">
+        <input id="gKeyIn" class="keyin" type="password" autocomplete="off" spellcheck="false" aria-label="API key Google Cloud">
+        <button class="btn" id="gSave">Lưu key</button>
+        <button class="btn red" id="gDel">Xoá key</button>
+      </div>
+      <div id="gVoices"></div>
+      <div class="btnRow"><button class="btn ghost" id="gClear">Xoá âm thanh đã lưu</button></div>
+      <p class="note"><b>Cách lấy key</b> (miễn phí khoảng 1 triệu ký tự mỗi tháng với giọng ⭐):
+      1) Vào console.cloud.google.com, tạo dự án và bật thanh toán (Google yêu cầu, nhưng dùng trong hạn mức miễn phí thì không mất tiền).
+      2) Tìm và bật <b>Cloud Text-to-Speech API</b>.
+      3) Vào APIs &amp; Services → Credentials → Create credentials → API key.
+      4) Bấm vào key → API restrictions → chỉ chọn Cloud Text-to-Speech API → Save. Dán key vào ô trên.<br>
+      Chữ cần đọc được gửi tới Google để tạo giọng; mỗi từ/câu chỉ gửi một lần rồi lưu trên máy này.</p>
+    </div>
+    <div class="setGroup">
+      <h3>🗣 Giọng của máy (dự phòng)</h3>
+      <div id="voices"></div>
+      <div class="btnRow"><button class="btn ghost" id="voiceTest">🔊 Nghe thử: “cá, cà, cả, cã, cạ”</button></div>
+      <p class="note">Nghe thử thấy sai dấu là do giọng của máy chưa tốt. Giọng có ⭐ thường đọc chuẩn hơn.<br>
+      • <b>Mac:</b> Cài đặt hệ thống → Trợ năng → Nội dung được đọc → Giọng hệ thống → Quản lý giọng… → Tiếng Việt → tải <b>Linh (Nâng cao)</b> hoặc <b>Linh (Cao cấp)</b>, rồi tải lại trang và chọn giọng đó ở trên.<br>
+      • <b>Cách dễ nhất:</b> mở game bằng <b>Microsoft Edge</b> — Edge có sẵn giọng “HoaiMy (Natural)” đọc tiếng Việt rất chuẩn (cần mạng).</p>
+    </div>
+    <div id="settings"></div>
+    <div class="setGroup">
+      <h3>📚 Bài học</h3>
+      <div class="btnRow"><button class="btn" id="pNew">✏️ Tạo bài mới</button><button class="btn red" id="pReset">Xoá hết sao của bé</button></div>
+    </div>
+    <p class="note">Micro nhận giọng nói tiếng Việt chạy tốt nhất trên Chrome hoặc Edge máy tính (cần mạng). Trên Safari cần bật Đọc chính tả của macOS. Nếu máy không có micro, bé đọc to và bố mẹ bấm “✔️ Bố mẹ chấm đúng”. Trò “Bắt bóng chữ” không cần micro, chỉ cần loa.<br>Nếu giọng đọc nghe như người nước ngoài: máy chưa có giọng tiếng Việt. Trên Mac vào Cài đặt hệ thống → Trợ năng → Nội dung được đọc → Giọng hệ thống → Quản lý giọng → tải giọng “Linh”. Trên Windows vào Cài đặt → Thời gian và ngôn ngữ → Giọng nói → thêm tiếng Việt.</p>
+  </div>
+</section>
+</div>
+
+<!-- kết quả -->
+<div class="over" id="over">
+  <div class="win" role="dialog" aria-labelledby="rtitle">
+    <div class="rstars" id="rstars"></div>
+    <h2 id="rtitle">Về đích rồi!</h2>
+    <div class="rinfo" id="rinfo"></div>
+    <div id="runlock"></div>
+    <div class="btnRow">
+      <button class="btn" id="again">🔁 Chơi lại</button>
+      <button class="btn green" id="next">Bài tiếp ➡️</button>
+      <button class="btn ghost" id="toHome">🏠 Trò khác</button>
+    </div>
+  </div>
+</div>
+<!-- cổng bố mẹ -->
+<div class="over" id="gate">
+  <div class="win" role="dialog" aria-labelledby="gateT">
+    <h2 id="gateT" style="font-size:30px;color:var(--ink)">Dành cho bố mẹ</h2>
+    <div class="gateQ" id="gateQ"></div>
+    <div class="btnRow" id="gateOpts"></div>
+    <div class="btnRow"><button class="btn ghost" id="gateClose">Đóng</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<!-- thứ tự nạp quan trọng: xem CLAUDE.md -->
+<script src="js/data.js"></script>
+<script src="js/util.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/game.js"></script>
+<script src="js/modes.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
