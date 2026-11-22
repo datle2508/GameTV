@@ -84,3 +84,11 @@ button:focus:not(:focus-visible){outline:none}
 /* thẻ "Từ khó của bé" */
 .lessonCard.weak{border-color:#d9a300;background:var(--rbg);box-shadow:0 6px 0 #d9a300}
 .lessonCard small{color:var(--soft);font-weight:800;font-size:14px}
+
+/* nhiệm vụ hôm nay (rewards.js) */
+.mission{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;width:100%;margin:10px 0 0;text-align:left;cursor:pointer}
+.mtxt{font:700 19px Nunito,sans-serif}
+.mtxt b{font-family:"Baloo 2",sans-serif}
+.mbar{flex:1 1 160px;height:18px;border-radius:99px;background:var(--wbg);overflow:hidden;border:2px solid var(--line)}
+.mbar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.mfire{font:800 19px "Baloo 2",sans-serif;color:var(--orange)}

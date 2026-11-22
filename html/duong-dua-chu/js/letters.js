@@ -1,4 +1,4 @@
-/* letters.js — 3 trò "Học chữ" (thêm vào IMPL của modes.js): IMPL.picture (Nối chữ với hình), IMPL.spell (Ghép vần: âm đầu + vần + dấu), IMPL.tone (Dấu nào đây?). Không cần micro; bấm lựa chọn [data-c] → IMPL.<trò>.pick(i,btn). Ghi từ khó qua noteWord. */
+/* letters.js — 4 trò "Học chữ" (thêm vào IMPL của modes.js): IMPL.picture (Nối chữ với hình), IMPL.spell (Ghép vần: âm đầu + vần + dấu), IMPL.tone (Dấu nào đây?), IMPL.hunt (Săn vần). Không cần micro; bấm lựa chọn [data-c] → IMPL.<trò>.pick(i,btn). Ghi từ khó qua noteWord. */
 
 /* phần chung: chọn đúng / chọn sai */
 function choiceRight(w,next,delay){
@@ -114,4 +114,38 @@ IMPL.tone={
   },
   onRead(){},ok(){},
   sample(){return G.sp?G.sp.w:""}
+};
+
+/* 🔍 Săn vần: mỗi vòng một vần (ưu tiên vần có trong bài), 6 thẻ tiếng — chạm hết các tiếng có vần đó */
+IMPL.hunt={
+  init(){
+    const words=uniqWords(G.P),all=[],by={},inLesson={};
+    words.concat(Object.keys(PICS)).forEach(w=>{if(all.indexOf(w)<0)all.push(w)});
+    all.forEach(w=>{const s=syl(w);if(s)(by[s.rh]=by[s.rh]||[]).push(w)});
+    words.forEach(w=>{const s=syl(w);if(s)inLesson[s.rh]=1});
+    G.list=shuffle(Object.keys(by).filter(r=>by[r].length>=2)).sort((a,b)=>(inLesson[b]?1:0)-(inLesson[a]?1:0)).slice(0,4);
+    G.by=by;G.all=all;G.step=0;G.hits=0;G.lock=false;
+    if(!G.list.length){ctrl({});$("stageBody").innerHTML='<div class="big">😅</div>';say("Bài này chưa có vần để săn. Bé chọn bài khác nhé!");return}
+    drawRoadStars(G.list.length);setProgress(0,`0/${G.list.length}`);ctrl({listen:"Nghe vần"});this.show();
+  },
+  show(){
+    const rh=G.list[G.step],right=shuffle(G.by[rh]).slice(0,3);G.lock=false;G.missed=null;
+    const sim=w=>{const s=syl(w);return (s.rh.charAt(0)===rh.charAt(0)?2:0)+Math.random()*2.5};   // nhiễu giống mặt chữ
+    const wrong=G.all.filter(w=>{const s=syl(w);return s&&s.rh!==rh}).map(w=>[w,sim(w)]).sort((a,b)=>b[1]-a[1]).slice(0,6-right.length).map(x=>x[0]);
+    G.tiles=shuffle(right.map(w=>({w,ok:1})).concat(wrong.map(w=>({w,ok:0}))));G.need=right.length;G.found=0;
+    $("stageBody").innerHTML=`<span class="cue">Vòng ${G.step+1}/${G.list.length} · Chạm vào mọi tiếng có vần</span><div class="big">${esc(rh)}</div>`+chipsHtml(G.tiles.map(t=>esc(t.w)));
+    say(`Tìm ${G.need} tiếng có vần “${rh}” nhé!`);speakVi("Tìm các tiếng có vần "+rh);
+  },
+  pick(i,btn){
+    if(G.lock||G.over)return;const t=G.tiles[i],rh=G.list[G.step];if(t.got)return;startClock();
+    if(t.ok){
+      t.got=1;btn.classList.add("ok");btn.disabled=true;ding();noteWord(t.w,true);G.found++;
+      if(G.found>=G.need){G.lock=true;carMove();say(rnd(PRAISE),1);G.hits++;setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
+        later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},1100);return}
+      say(`Đúng rồi! Còn ${G.need-G.found} tiếng nữa.`);
+    }else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say(`“${t.w}” không có vần “${rh}” đâu!`)}
+    const f=$("stageBody").querySelector("[data-c]:not([disabled])");if(f)f.focus();
+  },
+  onRead(){},ok(){},
+  sample(){const r=G.list&&G.list[G.step];return r?"vần "+r:""}
 };

@@ -103,3 +103,26 @@
 .slot.on{border-style:solid;border-color:var(--cc,var(--blue));color:var(--ink);background:var(--bigbg);animation:pop .4s}
 .slot.res{border:4px solid transparent;background:var(--sun);color:#3a2a00;min-width:2.4em}
 .plus{color:var(--soft);font-size:.7em}
+
+/* xe bóng ma (trò Đua từng từ) */
+.car.ghost{opacity:.42;color:#8f9bb3;filter:none;transition:left .3s linear}
+.gtag{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:22px}
+/* Đúng hay sai, Xếp câu, Truyện tranh (meaning.js) */
+.chip.tf{min-width:170px}
+.sent .gap{color:var(--soft)}
+.go.sm{min-height:60px;font-size:24px;padding:0 30px}
+/* Mưa chữ (arcade.js) */
+.rain{position:relative;width:min(560px,92vw);height:210px;border-radius:22px;background:var(--bigbg);overflow:hidden}
+.drop{position:absolute;top:6px;transform:translateX(-50%);font:800 clamp(26px,5vw,38px)/1 "Baloo 2",sans-serif;background:var(--card);color:var(--ink);border:3px solid var(--cc,var(--blue));border-radius:16px;padding:8px 14px 4px;white-space:nowrap;animation:dropfall var(--dur,6s) linear forwards}
+@keyframes dropfall{from{top:6px}to{top:150px}}
+.drop.caught{animation-play-state:paused;background:var(--dbg)}
+.drop.right{animation-play-state:paused;background:var(--sun);color:#3a2a00}
+.baskets{width:min(560px,92vw);justify-content:space-around}
+.chip.basket{font-size:clamp(40px,8vw,56px);min-width:clamp(90px,24vw,150px);padding:4px 10px}
+@media(prefers-reduced-motion:reduce){.drop{top:60px}}
+/* Lật thẻ (arcade.js) */
+.mem{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:min(640px,94vw)}
+.mcard{min-height:clamp(78px,13vw,116px);border-radius:18px;background:var(--cc,var(--blue));color:#fff;font:800 clamp(22px,4.4vw,36px)/1.1 "Baloo 2",sans-serif;box-shadow:0 6px 0 rgba(0,0,0,.18);padding:4px}
+.mcard.up{background:var(--card);color:var(--ink);border:4px solid var(--cc,var(--blue));animation:pop .3s}
+.mcard.done{background:var(--dbg);color:var(--dink);border:4px solid transparent;box-shadow:none}
+.mcard.emo{font-size:clamp(36px,7vw,56px)}

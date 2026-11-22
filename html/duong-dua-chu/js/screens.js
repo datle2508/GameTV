@@ -23,17 +23,23 @@ function updateTotals(){$("totalStars").textContent=totalStars()}
 
 function renderHome(){
   updateTotals();
-  const n=lessons().length*3;
-  const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${n}</span></button>`;
+  const den=m=>(m.src==="none"?1:m.src==="stories"?STORIES.length:lessons().length)*3;   // số sao tối đa của mỗi trò
+  renderMission();
+  const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${den(m)}</span></button>`;
   $("modes").innerHTML=MODE_GROUPS.map(g=>`<h3 class="grpT">${g[1]}</h3>`+MODES.map((m,i)=>m.grp===g[0]?card(m,i):"").join("")).join("");
 }
 function openPick(m,silent){
   curMode=m;const M=MODE(m);
+  if(M.src==="none"){if(silent)show("home");else startGame("bank",m);return}   // trò không cần chọn bài
   $("pickIcon").textContent=M.icon;$("pickTitle").textContent=M.name;$("pickTitle").style.color=M.col;$("pickDesc").textContent=M.desc;
   renderPick();show("pick");
   if(!silent&&S.voice)speakVi(M.say+" Bé chọn một bài nhé.");
 }
 function renderPick(){
+  if(MODE(curMode).src==="stories"){   // Truyện tranh: chọn truyện
+    $("lessonGrid").innerHTML=STORIES.map((t,i)=>`<div class="lcWrap"><button class="lessonCard" data-l="${t.id}" ${i===0?"data-primary":""}><span class="num">${i+1}</span><span class="li">${t.icon}</span><b>${esc(t.t)}</b><small>${t.pages.length} trang</small>${starRow(prog[t.id+"|story"]||0)}</button></div>`).join("");
+    return;
+  }
   const wl=!MODE(curMode).noWeak&&weakLesson(),ws=wl?prog["weak|"+curMode]||0:0;
   $("lessonGrid").innerHTML=(wl?`<div class="lcWrap"><button class="lessonCard weak" data-l="weak"><span class="li">📒</span><b>Từ khó của bé</b><small>${weakWords().length} từ cần luyện</small>${starRow(ws)}</button></div>`:"")+lessons().map((l,i)=>{
     const st=prog[l.id+"|"+curMode]||0,mine=l.id.charAt(0)==="u";

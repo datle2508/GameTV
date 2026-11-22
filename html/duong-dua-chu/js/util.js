@@ -61,7 +61,14 @@ function choicesFor(n,pool,k){
 let users=store.get("lessons",null);
 if(!Array.isArray(users)){users=[];const old=store.get("custom","");if(old&&String(old).trim())users.push({id:"u1",icon:"📖",t:"Bài của bé",x:old});store.set("lessons",users)}
 const lessons=()=>BUILTIN.concat(users);
-const findLesson=id=>id==="weak"?weakLesson():lessons().find(l=>l.id===id);   // "weak": bài Từ khó (weak.js)
+/* bài đặc biệt: "weak" = Từ khó (weak.js) · "bank" = trò không cần chọn bài · "st…" = truyện trong STORIES */
+function findLesson(id){
+  if(id==="weak")return weakLesson();
+  if(id==="bank")return {id:"bank",icon:"🎲",t:"Câu hỏi ngẫu nhiên",x:""};
+  const st=STORIES.find(s=>s.id===id);
+  if(st)return {id:st.id,icon:st.icon,t:st.t,x:st.pages.map(p=>p[1]).join(" "),story:st};
+  return lessons().find(l=>l.id===id);
+}
 const MODE=id=>MODES.find(m=>m.id===id);
 let prog=store.get("prog",{});          // "idBài|trò" → số sao tốt nhất (1–3)
 const totalStars=()=>Object.keys(prog).reduce((a,k)=>a+(+prog[k]||0),0);

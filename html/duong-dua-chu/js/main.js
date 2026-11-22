@@ -19,6 +19,7 @@ $("lessonGrid").addEventListener("click",e=>{
 });
 $("stageBody").addEventListener("click",e=>{
   if(e.target.closest("#qgo")){IMPL.quick.begin();return}
+  if(e.target.closest("[data-next]")&&IMPL_().next){IMPL_().next();return}   // "Trang sau", "Bắt đầu" (Mưa chữ)
   const bl=e.target.closest("[data-b]");if(bl&&G.mode==="balloon"){IMPL.balloon.tap(+bl.getAttribute("data-b"),bl);return}
   const ch=e.target.closest("[data-c]");if(ch&&!G.over&&IMPL_().pick)IMPL_().pick(+ch.getAttribute("data-c"),ch);
 });
@@ -26,7 +27,11 @@ $("mic").addEventListener("click",()=>{if(listening)stopListen();else startListe
 $("ok").addEventListener("click",()=>{if(!G.over)IMPL_().ok()});
 $("listen").addEventListener("click",()=>{if(!G.over){const t=IMPL_().sample();if(t)speakVi(t)}});
 $("again").addEventListener("click",()=>startGame(G.lesson.id,G.mode));
-$("next").addEventListener("click",()=>{const L=lessons(),i=L.findIndex(l=>l.id===G.lesson.id);startGame(L[(i+1)%L.length].id,G.mode)});
+$("next").addEventListener("click",()=>{
+  const src=MODE(G.mode).src,L=src==="stories"?STORIES:lessons(),i=L.findIndex(l=>l.id===G.lesson.id);
+  startGame(src==="none"?"bank":L[(i+1)%L.length].id,G.mode)});
+$("albumBtn").addEventListener("click",()=>{renderAlbum();show("album")});
+$("mission").addEventListener("click",()=>{renderAlbum();show("album")});
 $("toHome").addEventListener("click",()=>show("home"));
 $("edText").addEventListener("input",edPreview);
 $("edIcons").addEventListener("click",e=>{const b=e.target.closest("[data-ic]");if(b){edIcon=b.getAttribute("data-ic");renderIcons();$("edIcons").querySelector('[aria-pressed="true"]').focus()}});
@@ -59,7 +64,7 @@ $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
 $("weakClear").addEventListener("click",()=>{if(window.confirm("Xoá danh sách từ khó của bé?")){clearWeak();toast("Đã xoá")}});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
@@ -97,7 +102,8 @@ document.addEventListener("keydown",e=>{
   if((e.key==="Enter"||e.keyCode===13)&&(document.activeElement===document.body||!document.activeElement)){e.preventDefault();moveFocus(0,0);return}
   if(/^[1-9]$/.test(e.key)){
     const n=+e.key-1;
-    if(screen==="pick"&&lessons()[n]){startGame(lessons()[n].id,curMode);return}
+    const L=MODE(curMode).src==="stories"?STORIES:lessons();
+    if(screen==="pick"&&L[n]){startGame(L[n].id,curMode);return}
     if(screen==="home"&&MODES[n]){openPick(MODES[n].id);return}
   }
   if(screen==="play")switch(e.keyCode){
@@ -108,6 +114,6 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ---------- khởi động ---------- */
-$("car").innerHTML=CAR_SVG;
+$("car").innerHTML=CAR_SVG;$("ghost").innerHTML=CAR_SVG+'<span class="gtag">👻</span>';
 $("buddyHome").innerHTML=FACE_SVG;$("buddyPlay").innerHTML=FACE_SVG;
 applyCar();renderHome();

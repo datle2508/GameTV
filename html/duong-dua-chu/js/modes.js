@@ -8,10 +8,20 @@ race:{
   init(){
     setRead(G.P.words.map(w=>w.n));drawRoadStars(G.R.length);setProgress(0,`0/${G.R.length}`);
     ctrl({mic:1,ok:1,listen:1});
-    say(mode==="manual"?"Bé đọc to, bố mẹ bấm ✔️ nhé!":"Bấm 🎤 rồi đọc to nhé!");this.render(false);
+    /* 👻 xe bóng ma: chạy lại đúng nhịp lần đọc nhanh nhất của bé ở bài này (mốc thời gian từng từ) */
+    G.trace=[];const gh=store.get("ghost_"+G.lesson.id,null),el=$("ghost");
+    G.ghost=gh&&gh.length===G.R.length?gh:null;el.hidden=!G.ghost;el.style.setProperty("--p",0);
+    if(G.ghost)G.ghostT=setInterval(()=>{if(!G.t0||G.over)return;const t=Date.now()-G.t0;let k=0;while(k<G.ghost.length&&G.ghost[k]<=t)k++;el.style.setProperty("--p",k/G.ghost.length)},250);
+    say((G.ghost?"Đua với xe bóng ma 👻 nào! ":"")+(mode==="manual"?"Bé đọc to, bố mẹ bấm ✔️ nhé!":"Bấm 🎤 rồi đọc to nhé!"));this.render(false);
+  },
+  ghostFinish(ms){
+    const best=G.ghost?G.ghost[G.ghost.length-1]:0;
+    if(G.trace.length===G.R.length&&(!best||ms<best))store.set("ghost_"+G.lesson.id,G.trace);
+    return [!G.ghost?"👻 Lần sau bé sẽ đua với xe bóng ma của chính mình!":ms<best?`👻 Bé đã vượt xe bóng ma! (kỷ lục cũ ${fmt(best)})`:"👻 Xe bóng ma về trước rồi. Thử lại nhé!"];
   },
   render(anim){const W=G.P.words,i=G.ri;$("stageBody").innerHTML=`<span class="cue">Bé đọc to từ này</span><div class="big${anim?" ok":""}">${i<W.length?esc(W[i].c):"Hoan hô!"}</div>`;renderStrip(i)},
-  onRead(){goodRead();vroom();carMove();say(rnd(PRAISE),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
+  onRead(){const t=Date.now()-G.t0;while(G.trace.length<G.ri)G.trace.push(t);
+    goodRead();vroom();carMove();say(rnd(PRAISE),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
   ok(){bump(1)},
   sample(){const w=G.P.words[G.ri];return w?w.c:""}
 },

@@ -53,8 +53,8 @@ function startGame(lid,mid){
 }
 function endGame(){
   (G.to||[]).forEach(clearTimeout);G.to=[];
-  clearInterval(G.tickT);clearInterval(G.clockT);clearTimeout(finTimer);
-  G.R=[];G.over=true;
+  clearInterval(G.tickT);clearInterval(G.clockT);clearInterval(G.ghostT);clearTimeout(finTimer);
+  G.R=[];G.over=true;$("ghost").hidden=true;
   $("over").classList.remove("show");
 }
 
@@ -87,7 +87,7 @@ function goodRead(){G.fails=0;$("listen").classList.remove("hint")}
 
 function finish(){
   if(G.over)return;G.over=true;
-  G.to.forEach(clearTimeout);G.to=[];clearInterval(G.tickT);clearInterval(G.clockT);stopListen();
+  G.to.forEach(clearTimeout);G.to=[];clearInterval(G.tickT);clearInterval(G.clockT);clearInterval(G.ghostT);stopListen();
   const ms=G.t0?Date.now()-G.t0:0,stars=G.errors<=1?3:G.errors<=4?2:1;
   const key=G.lesson.id+"|"+G.mode,before=totalStars(),old=+prog[key]||0;
   if(stars>old){prog[key]=stars;store.set("prog",prog)}
@@ -96,7 +96,8 @@ function finish(){
   $("rstars").innerHTML=[0,1,2].map(i=>`<svg class="${i<stars?"on":""}" style="animation-delay:${(.25+i*.25).toFixed(2)}s" viewBox="0 0 24 24"><path d="${STAR}"/></svg>`).join("");
   $("rtitle").textContent=["","Hoàn thành!","Giỏi lắm!","Xuất sắc!"][stars];
   $("rinfo").innerHTML=(ms>=1000?`⏱ ${fmt(ms)}`:"")+(after>before?`<br>⭐ +${after-before} sao`:"")+(stars<3?"<br>Chơi lại để được 3 sao nhé!":"");
-  $("runlock").innerHTML=unl.length?`<div class="unlock">🎉 Mở khoá xe mới! ${unl.map(c=>`<span class="gcar sm" style="color:${c.c}">${CAR_SVG}</span>`).join("")}</div>`:"";
+  let extra=rewardFinish(stars,ms);if(IMPL_().ghostFinish)extra=extra.concat(IMPL_().ghostFinish(ms));   // sticker, nhiệm vụ, xe bóng ma
+  $("runlock").innerHTML=(unl.length?`<div class="unlock">🎉 Mở khoá xe mới! ${unl.map(c=>`<span class="gcar sm" style="color:${c.c}">${CAR_SVG}</span>`).join("")}</div>`:"")+extra.map(x=>`<div class="unlock">${x}</div>`).join("");
   updateTotals();
   finTimer=setTimeout(()=>{$("over").classList.add("show");$("again").focus();fanfare();confetti();if(S.voice)speakVi($("rtitle").textContent)},900);
 }

@@ -26,9 +26,11 @@
     <div class="bubble" id="heroMsg">Chào bé! Hôm nay mình chơi trò gì nào?</div>
     <button class="say" id="heroSay" aria-label="Nghe lời chào">🔊</button>
   </div>
+  <button class="card mission" id="mission" aria-label="Nhiệm vụ hôm nay, mở album sticker"></button>
   <h2 class="sec">Chọn trò chơi</h2>
   <div class="modes" id="modes"></div>
   <div class="extras">
+    <button class="bigBtn" id="albumBtn"><span class="e">🏅</span><span>Album sticker<small id="albumCount"></small></span></button>
     <button class="bigBtn" id="garageBtn"><span class="e">🚗</span><span>Gara xe<small>Chọn xe, mở khoá xe mới</small></span></button>
     <button class="bigBtn" id="newBtn"><span class="e">✏️</span><span>Tạo bài mới<small>Bố mẹ và bé tự soạn bài đọc</small></span></button>
   </div>
@@ -66,6 +68,7 @@
     <div class="finishline"></div>
     <div class="gate"><div class="pole"></div><div class="flag"></div><div class="label">ĐÍCH</div></div>
     <div id="roadStars"></div>
+    <div class="car ghost" id="ghost" hidden></div>
     <div class="car" id="car"></div>
     <div class="puff" id="puff"></div>
     <div class="badge"><span id="score">0/0</span><span id="clock">0:00</span></div>
@@ -116,6 +119,18 @@
 </section>
 
 <!-- ========== GARA ========== -->
+<section class="screen" id="album">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">🏅</span>
+    <div class="grow"><h2>Album sticker</h2><small id="albumSub"></small></div>
+  </div>
+  <div class="card">
+    <div class="stickers" id="stickers"></div>
+    <p class="note">Mỗi lần được 3 ⭐, bé nhận 1 sticker mới. Chơi đủ 3 trò trong ngày (nhiệm vụ hôm nay) được thưởng thêm 1 sticker.</p>
+  </div>
+</section>
+
 <section class="screen" id="garage">
   <div class="head">
     <button class="ib" data-back aria-label="Quay lại">⬅️</button>
@@ -185,6 +200,10 @@
     </div>
     <div id="settings"></div>
     <div class="setGroup">
+      <h3>📊 Bé đã chơi (7 ngày qua)</h3>
+      <div id="report"></div>
+    </div>
+    <div class="setGroup">
       <h3>📒 Từ bé hay sai</h3>
       <div id="weakList"></div>
       <div class="btnRow"><button class="btn ghost" id="weakClear">Xoá danh sách</button></div>
@@ -228,11 +247,14 @@
 <script src="js/util.js"></script>
 <script src="js/viet.js"></script>
 <script src="js/weak.js"></script>
+<script src="js/rewards.js"></script>
 <script src="js/sound.js"></script>
 <script src="js/screens.js"></script>
 <script src="js/game.js"></script>
 <script src="js/modes.js"></script>
 <script src="js/letters.js"></script>
+<script src="js/meaning.js"></script>
+<script src="js/arcade.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/voice.js"></script>
 <script src="js/main.js"></script>
