@@ -99,7 +99,6 @@ function renderSettings(){
   $("settings").innerHTML=SETS.map(g=>`<div class="setGroup"><h3>${g.t}</h3><div class="seg">${g.o.map(o=>`<button data-k="${g.k}" data-v='${JSON.stringify(o[0])}' aria-pressed="${S[g.k]===o[0]}">${o[1]}</button>`).join("")}</div></div>`).join("");
 }
 /* chọn giọng đọc: liệt kê mọi giọng tiếng Việt máy có, cho nghe thử */
-const VOICE_TEST="cá, cà, cả, cã, cạ. Mẹ đưa bé đi chợ.";
 function renderVoices(){
   let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^vi([-_]|$)/i.test(v.lang))}catch(e){}
   const cur=viVoice?viVoice.name:"";

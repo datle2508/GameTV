@@ -83,7 +83,7 @@ quick:{
 /* 🎈 Bắt bóng chữ: máy đọc một từ, bé chạm đúng quả bóng (không cần micro) */
 balloon:{
   init(){
-    G.list=shuffle(uniqWords(G.P)).slice(0,8);G.step=0;G.hits=0;gPrefetch(G.list);
+    G.list=shuffle(uniqWords(G.P)).slice(0,8);G.step=0;G.hits=0;aiPrefetch(G.list);
     drawRoadStars(G.list.length);setProgress(0,`0/${G.list.length}`);ctrl({listen:"Nghe lại"});this.show(true);
   },
   show(first){
@@ -92,6 +92,7 @@ balloon:{
     say(first?"Nghe kỹ rồi chạm vào quả bóng nhé!":"Từ tiếp theo nè!");
     if(first)speakVi((S.voice?MODE("balloon").say+" ":"")+w);   // lần đầu: nói ngay trong cú bấm (Safari cần vậy)
     else later(()=>speakVi(w),450);
+    aiPrefetch([G.list[G.step+1]]);   // tải trước từ kế tiếp
   },
   tap(i,btn){
     if(G.lock||G.over)return;const w=G.list[G.step];startClock();

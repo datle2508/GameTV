@@ -40,16 +40,26 @@ $("voices").addEventListener("click",e=>{const b=e.target.closest("[data-voice]"
   const v=vs[+b.getAttribute("data-voice")];if(!v)return;
   S.voiceName=v.name;saveS();viVoice=v;voiceNote();renderVoices();webSpeak(VOICE_TEST);
   const f=$("voices").querySelector('[aria-pressed="true"]');if(f)f.focus()});
-$("gSave").addEventListener("click",()=>{const v=$("gKeyIn").value.trim();if(!v)return;gKey=v;store.set("gkey",v);$("gKeyIn").value="";gErr="";gFail.shown=0;renderG();
+$("tProv").addEventListener("click",e=>{const b=e.target.closest("[data-prov]");if(!b)return;const p=b.getAttribute("data-prov");
+  S.ttsProv=p;saveS();aiReset(p);renderAI();voiceNote();
+  if(p==="gemini"&&mKey&&!mModels)mLoadModels();if(p==="google"&&gKey&&!gVoices)gLoadVoices();if(p==="device")renderVoices();
+  const f=$("tProv").querySelector('[aria-pressed="true"]');if(f)f.focus()});
+$("mSave").addEventListener("click",()=>{const v=$("mKeyIn").value.trim();if(!v)return;mKey=v;store.set("gmkey",v);mOut={};store.set("gmout",mOut);$("mKeyIn").value="";S.ttsProv="gemini";saveS();aiReset("gemini");renderAI();
+  mLoadModels().then(()=>{if(!mErr)speakVi(VOICE_TEST)})});
+$("mDel").addEventListener("click",()=>{if(!window.confirm("Xoá key Gemini? Game sẽ dùng giọng của máy."))return;mKey="";mModels=null;store.set("gmkey","");aiReset("gemini");stopAudio();renderAI();voiceNote();toast("Đã xoá key")});
+$("mModels").addEventListener("click",e=>{const b=e.target.closest("[data-mm]");if(!b)return;S.gmModel=b.getAttribute("data-mm");saveS();delete mOut[S.gmModel];store.set("gmout",mOut);aiReset("gemini");renderAI();voiceNote();speakVi(VOICE_TEST)});
+$("mVoices").addEventListener("click",e=>{const b=e.target.closest("[data-mv]");if(!b)return;S.gmVoice=b.getAttribute("data-mv");saveS();aiReset("gemini");renderAI();voiceNote();speakVi(VOICE_TEST);
+  const f=$("mVoices").querySelector('[aria-pressed="true"]');if(f)f.focus()});
+$("gSave").addEventListener("click",()=>{const v=$("gKeyIn").value.trim();if(!v)return;gKey=v;store.set("gkey",v);$("gKeyIn").value="";S.ttsProv="google";saveS();aiReset("google");renderAI();
   gLoadVoices().then(()=>{if(!gErr)speakVi(VOICE_TEST)})});
-$("gDel").addEventListener("click",()=>{if(!window.confirm("Xoá key Google? Game sẽ dùng giọng của máy."))return;gKey="";gVoices=null;gErr="";store.set("gkey","");stopAudio();renderG();voiceNote();toast("Đã xoá key")});
+$("gDel").addEventListener("click",()=>{if(!window.confirm("Xoá key Google Cloud? Game sẽ dùng giọng của máy."))return;gKey="";gVoices=null;store.set("gkey","");aiReset("google");stopAudio();renderAI();voiceNote();toast("Đã xoá key")});
 $("gClear").addEventListener("click",()=>{Object.keys(gMem).forEach(k=>delete gMem[k]);idbClear().then(()=>toast("Đã xoá âm thanh đã lưu"))});
 $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");if(!b||!gVoices)return;const v=gVoices[+b.getAttribute("data-gv")];if(!v)return;
-  S.gVoice=v.name;saveS();gErr="";renderG();voiceNote();speakVi(VOICE_TEST);const f=$("gVoices").querySelector('[aria-pressed="true"]');if(f)f.focus()});
+  S.gVoice=v.name;saveS();aiReset("google");renderAI();voiceNote();speakVi(VOICE_TEST);const f=$("gVoices").querySelector('[aria-pressed="true"]');if(f)f.focus()});
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderG();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
 /* ---------- điều khiển TV (remote) / bàn phím ----------

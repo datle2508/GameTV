@@ -10,6 +10,6 @@ const tick=()=>tone(1200,.06,"sine",0,.06);
 const oops=()=>tone(300,.25,"triangle",0,.12,200);
 /* Safari chỉ cho phát âm thanh nếu AudioContext được tạo/resume ngay trong cú bấm đầu tiên */
 const unlockAudio=()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){}};
-["pointerdown","keydown","touchstart"].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
+["pointerdown","pointerup","mousedown","click","keydown","touchstart","touchend"].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
 const fanfare=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.35,"square",i*.16,.07));
 function confetti(){for(let i=0;i<70;i++){const d=document.createElement("div");d.className="conf";d.style.left=Math.random()*100+"vw";d.style.background=CARS[i%CARS.length].c;d.style.animationDuration=2+Math.random()*2+"s";d.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)}}

@@ -18,7 +18,7 @@ Chỉ sửa mã nguồn trong thư mục này. Sau khi sửa, chạy `python3 bu
 | `js/game.js` | Trạng thái `G`, tiến độ, `heard()` (khớp lời bé đọc), `finish()` (chấm sao) |
 | `js/modes.js` | `IMPL.race/sentence/quick/balloon/fill`. Mỗi dạng có `init`, `onRead`, `ok`, `sample` |
 | `js/speech.js` | Micro: claude dictation → SpeechRecognition vi-VN → chế độ bố mẹ chấm |
-| `js/voice.js` | Đọc mẫu: Google Cloud TTS (có cache) → giọng Claude → speechSynthesis |
+| `js/voice.js` | Đọc mẫu: `prov()` chọn nguồn theo `S.ttsProv`: Gemini TTS (key AI Studio miễn phí, lấy danh sách model qua API) hoặc Google Cloud TTS. Hai nguồn dùng chung cache `aiAudio`. Dự phòng: giọng Claude → speechSynthesis. Góc bố mẹ: `renderAI` |
 | `js/main.js` | Gắn sự kiện, điều khiển remote/bàn phím, khởi động |
 
 Thêm một dạng thử thách mới cần 3 bước:
@@ -36,7 +36,7 @@ Thêm một dạng thử thách mới cần 3 bước:
 - Âm thanh phát qua `actx` (đã mở khoá ở cú chạm đầu tiên) vì Safari chặn phát âm thanh khi không có cú bấm.
 - Khi bật micro, phải dừng mọi giọng đọc đang phát (`startListen`). Nếu không, micro nghe nhầm giọng máy thành bé đọc.
 - Dùng `esc()` cho mọi chữ do người dùng nhập trước khi đưa vào `innerHTML`.
-- localStorage dùng tiền tố `ddc_`: `settings`, `lessons`, `prog`, `car`, `gkey`. IndexedDB `ddc_audio` lưu âm thanh Google.
+- localStorage dùng tiền tố `ddc_`: `settings`, `lessons`, `prog`, `car`, `gkey` (Google Cloud), `gmkey` (Gemini). IndexedDB `ddc_audio` lưu âm thanh Google.
 
 ## Kiểm tra
 Mở `index.html` trực tiếp trong trình duyệt. Muốn chạy không cần giao diện: `"/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" --headless=new --virtual-time-budget=… --dump-dom file://…`. Trong chế độ headless không có micro, nên game tự chuyển sang chế độ bố mẹ chấm (nút `#ok`).

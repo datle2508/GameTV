@@ -135,29 +135,53 @@
   </div>
   <div class="card">
     <div class="setGroup">
-      <h3>🤖 Giọng AI của Google (đọc chuẩn dấu)</h3>
-      <div id="gStatus" class="note"></div>
-      <div class="btnRow">
-        <input id="gKeyIn" class="keyin" type="password" autocomplete="off" spellcheck="false" aria-label="API key Google Cloud">
-        <button class="btn" id="gSave">Lưu key</button>
-        <button class="btn red" id="gDel">Xoá key</button>
+      <h3>🗣 Giọng đọc mẫu</h3>
+      <div id="tProv"></div>
+
+      <div id="pGemini">
+        <div id="mStatus" class="note"></div>
+        <div class="btnRow">
+          <input id="mKeyIn" class="keyin" type="password" autocomplete="off" spellcheck="false" aria-label="API key Gemini">
+          <button class="btn" id="mSave">Lưu key</button>
+          <button class="btn red" id="mDel">Xoá key</button>
+        </div>
+        <div id="mDiag" class="note" aria-live="polite"></div>
+        <div id="mModels"></div>
+        <div id="mVoices"></div>
+        <p class="note"><b>Cách lấy key miễn phí</b> (không cần thẻ thanh toán):
+        1) Vào <b>aistudio.google.com</b>, đăng nhập tài khoản Google.
+        2) Bấm <b>Get API key</b> → <b>Create API key</b>.
+        3) Chép key, dán vào ô trên rồi bấm Lưu key.<br>
+        Gói miễn phí giới hạn số lần đọc mỗi phút và mỗi ngày. Game lưu lại âm thanh để dùng lại; khi tạm hết lượt sẽ dùng giọng của máy rồi tự thử lại sau.
+        Với gói miễn phí, Google có thể dùng chữ gửi lên (chữ trong bài đọc) để cải thiện sản phẩm.</p>
       </div>
-      <div id="gVoices"></div>
-      <div class="btnRow"><button class="btn ghost" id="gClear">Xoá âm thanh đã lưu</button></div>
-      <p class="note"><b>Cách lấy key</b> (miễn phí khoảng 1 triệu ký tự mỗi tháng với giọng ⭐):
-      1) Vào console.cloud.google.com, tạo dự án và bật thanh toán (Google yêu cầu, nhưng dùng trong hạn mức miễn phí thì không mất tiền).
-      2) Tìm và bật <b>Cloud Text-to-Speech API</b>.
-      3) Vào APIs &amp; Services → Credentials → Create credentials → API key.
-      4) Bấm vào key → API restrictions → chỉ chọn Cloud Text-to-Speech API → Save. Dán key vào ô trên.<br>
-      Chữ cần đọc được gửi tới Google để tạo giọng; mỗi từ/câu chỉ gửi một lần rồi lưu trên máy này.</p>
-    </div>
-    <div class="setGroup">
-      <h3>🗣 Giọng của máy (dự phòng)</h3>
-      <div id="voices"></div>
-      <div class="btnRow"><button class="btn ghost" id="voiceTest">🔊 Nghe thử: “cá, cà, cả, cã, cạ”</button></div>
-      <p class="note">Nghe thử thấy sai dấu là do giọng của máy chưa tốt. Giọng có ⭐ thường đọc chuẩn hơn.<br>
-      • <b>Mac:</b> Cài đặt hệ thống → Trợ năng → Nội dung được đọc → Giọng hệ thống → Quản lý giọng… → Tiếng Việt → tải <b>Linh (Nâng cao)</b> hoặc <b>Linh (Cao cấp)</b>, rồi tải lại trang và chọn giọng đó ở trên.<br>
-      • <b>Cách dễ nhất:</b> mở game bằng <b>Microsoft Edge</b> — Edge có sẵn giọng “HoaiMy (Natural)” đọc tiếng Việt rất chuẩn (cần mạng).</p>
+
+      <div id="pGoogle">
+        <div id="gStatus" class="note"></div>
+        <div class="btnRow">
+          <input id="gKeyIn" class="keyin" type="password" autocomplete="off" spellcheck="false" aria-label="API key Google Cloud">
+          <button class="btn" id="gSave">Lưu key</button>
+          <button class="btn red" id="gDel">Xoá key</button>
+        </div>
+        <div id="gVoices"></div>
+        <p class="note"><b>Cách lấy key</b> (miễn phí khoảng 1 triệu ký tự mỗi tháng với giọng ⭐, nhưng phải bật thanh toán):
+        1) Vào console.cloud.google.com, tạo dự án và bật thanh toán.
+        2) Tìm và bật <b>Cloud Text-to-Speech API</b>.
+        3) APIs &amp; Services → Credentials → Create credentials → API key.
+        4) Bấm vào key → API restrictions → chỉ chọn Cloud Text-to-Speech API → Save. Dán key vào ô trên.</p>
+      </div>
+
+      <div id="pDevice">
+        <div id="voices"></div>
+        <p class="note">Giọng có ⭐ thường đọc chuẩn hơn. Nghe sai dấu là do giọng của máy chưa tốt:<br>
+        • <b>Mac:</b> Cài đặt hệ thống → Trợ năng → Nội dung được đọc → Giọng hệ thống → Quản lý giọng… → Tiếng Việt → tải <b>Linh (Nâng cao)</b>, rồi tải lại trang.<br>
+        • <b>Microsoft Edge</b> có sẵn giọng “Hoài My (Natural)” đọc khá chuẩn (cần mạng).</p>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn ghost" id="voiceTest">🔊 Nghe thử: “cá, cà, cả, cã, cạ”</button>
+        <button class="btn ghost" id="gClear">Xoá âm thanh đã lưu</button>
+      </div>
     </div>
     <div id="settings"></div>
     <div class="setGroup">
