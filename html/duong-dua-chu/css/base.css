@@ -78,3 +78,9 @@ button:focus:not(:focus-visible){outline:none}
 .st{font-size:24px;letter-spacing:2px;line-height:1;color:var(--line)}
 .st .on{color:var(--sun);text-shadow:0 2px 0 #d9a300}
 .editBtn{position:absolute;top:8px;right:8px;width:46px;height:46px;border-radius:14px;background:var(--wbg);font-size:22px;display:flex;align-items:center;justify-content:center}
+
+/* trang chủ: tiêu đề nhóm trò */
+.grpT{grid-column:1/-1;margin:8px 0 -2px;font:800 22px "Baloo 2",sans-serif;color:var(--soft)}
+/* thẻ "Từ khó của bé" */
+.lessonCard.weak{border-color:#d9a300;background:var(--rbg);box-shadow:0 6px 0 #d9a300}
+.lessonCard small{color:var(--soft);font-weight:800;font-size:14px}

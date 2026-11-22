@@ -1,4 +1,4 @@
-/* modes.js — IMPL: 5 dạng thử thách race / sentence / quick / balloon / fill — mỗi dạng có init, onRead, ok, sample (+ hàm riêng). */
+/* modes.js — IMPL: 5 trò race / sentence / quick / balloon / fill (3 trò Học chữ ở letters.js) — mỗi dạng có init, onRead, ok, sample (+ hàm riêng). */
 /* =====================================================================
    TRÒ CHƠI — từng dạng thử thách
    ===================================================================== */
@@ -72,7 +72,7 @@ quick:{
   },
   miss(){
     G.phase="miss";G.R=[];G.errors++;oops();
-    const st=G.steps[G.step];if(!st.retry)G.steps.push({w:st.w,retry:true});
+    const st=G.steps[G.step];if(!st.retry)G.steps.push({w:st.w,retry:true});noteWord(st.w,false);
     const b=$("stageBody").querySelector(".big");if(b)b.classList.add("miss");
     say(st.retry?"Không sao, lần sau mình đọc được!":"Hết giờ rồi! Lát nữa đọc lại nhé.");later(()=>this.next(),1100);
   },
@@ -87,7 +87,7 @@ balloon:{
     drawRoadStars(G.list.length);setProgress(0,`0/${G.list.length}`);ctrl({listen:"Nghe lại"});this.show(true);
   },
   show(first){
-    G.lock=false;const w=G.list[G.step];G.choices=choicesFor(w,uniqWords(G.P),3);const cols=shuffle(BALLOON);
+    G.lock=false;G.missed=null;const w=G.list[G.step];G.choices=choicesFor(w,uniqWords(G.P),3);const cols=shuffle(BALLOON);
     $("stageBody").innerHTML=`<span class="cue">Từ ${G.step+1}/${G.list.length} · Chạm vào quả bóng có từ bé nghe được</span><div class="balloons">${G.choices.map((c,i)=>`<button class="balloon" data-b="${i}" ${i===0?"data-primary":""} style="--bc:${cols[i%cols.length]};--d:${(-i*.7).toFixed(1)}s">${esc(c)}</button>`).join("")}</div>`;
     say(first?"Nghe kỹ rồi chạm vào quả bóng nhé!":"Từ tiếp theo nè!");
     if(first)speakVi((S.voice?MODE("balloon").say+" ":"")+w);   // lần đầu: nói ngay trong cú bấm (Safari cần vậy)
@@ -97,10 +97,10 @@ balloon:{
   tap(i,btn){
     if(G.lock||G.over)return;const w=G.list[G.step];startClock();
     if(G.choices[i]===w){
-      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(rnd(PRAISE),1);
+      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(rnd(PRAISE),1);noteWord(w,true);
       setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
       later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},850);
-    }else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng rồi, nghe lại nhé!");later(()=>speakVi(w),450)}
+    }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng rồi, nghe lại nhé!");later(()=>speakVi(w),450)}
   },
   onRead(){},ok(){},
   sample(){return G.list[G.step]||""}
@@ -115,7 +115,7 @@ fill:{
     drawRoadStars(G.list.length);setProgress(0,`0/${G.list.length}`);this.show();
   },
   show(){
-    G.phase="pick";G.R=[];G.filledAnim=0;const it=G.list[G.step];
+    G.phase="pick";G.R=[];G.filledAnim=0;G.missed=null;const it=G.list[G.step];
     G.choices=choicesFor(G.P.words[it.b].n,uniqWords(G.P),3);
     ctrl({mic:listening?1:0});
     this.renderSent();
@@ -138,7 +138,7 @@ fill:{
       setRead(G.P.words.slice(s.start,s.end).map(x=>x.n),true);
       this.renderSent();G.filledAnim=0;ctrl({mic:1,ok:1,listen:1});
       say(mode==="manual"?"Đúng rồi! Bé đọc cả câu, bố mẹ bấm ✔️ nhé":"Đúng rồi! Giờ bấm 🎤 đọc cả câu nhé",1);focusMain();
-    }else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, thử từ khác nhé!")}
+    }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, thử từ khác nhé!")}
   },
   onRead(){
     goodRead();

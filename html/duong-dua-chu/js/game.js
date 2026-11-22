@@ -44,10 +44,11 @@ function startGame(lid,mid){
   $("pLesson").textContent=L.icon+" "+L.t;$("pMode").textContent=M.icon+" "+M.name;
   $("heard").textContent="";$("clock").textContent="0:00";$("listen").classList.remove("hint");
   $("strip").hidden=!(mid==="race"||mid==="sentence");
+  $("stageBody").style.setProperty("--cc",M.col);   // màu nút lựa chọn theo trò
   $("over").classList.remove("show");
   show("play");
   IMPL[mid].init();
-  if(S.voice&&mid!=="balloon")speakVi(M.say);
+  if(S.voice&&!M.selfSay)speakVi(M.say);   // selfSay: trò tự đọc hướng dẫn kèm từ đầu tiên
   focusMain();
 }
 function endGame(){
@@ -58,8 +59,8 @@ function endGame(){
 }
 
 /* --- đọc: dãy từ cần đọc G.R, vị trí G.ri; khớp lần lượt từ G.base (đầu cụm đang nói) --- */
-function setRead(words,skipCurrent){G.R=words.slice();G.ri=0;G.base=0;G.skip=skipCurrent?phraseToks:0}
-function bump(by){if(!G.R.length||G.ri>=G.R.length||by<=0)return;startClock();G.ri=Math.min(G.R.length,G.ri+by);IMPL_().onRead(by)}
+function setRead(words,skipCurrent){G.missed=null;G.R=words.slice();G.ri=0;G.base=0;G.skip=skipCurrent?phraseToks:0}
+function bump(by){if(!G.R.length||G.ri>=G.R.length||by<=0)return;startClock();const to=Math.min(G.R.length,G.ri+by);for(let k=G.ri;k<to;k++)noteWord(G.R[k],true);G.ri=to;IMPL_().onRead(by)}
 function heard(text,final){
   if(stale||screen!=="play")return;
   const toks=norm(text).split(" ").filter(Boolean);
@@ -69,7 +70,7 @@ function heard(text,final){
     const use=toks.slice(G.skip||0);
     let j=G.base;
     for(const tok of use){if(j<G.R.length&&same(tok,G.R[j]))j++}
-    if(j>G.ri){const by=j-G.ri;G.ri=j;startClock();IMPL_().onRead(by)}
+    if(j>G.ri){const by=j-G.ri;for(let k=G.ri;k<j;k++)noteWord(G.R[k],true);G.ri=j;startClock();IMPL_().onRead(by)}
     else if(final&&j===G.base&&use.length)readFail();
   }
   /* các từ đã nói TRƯỚC khi từ mới hiện ra (Đọc nhanh, Tìm từ) không được tính cho từ mới */
@@ -77,6 +78,7 @@ function heard(text,final){
 }
 function readFail(){
   const I=IMPL_();G.fails++;if(I.countFails!==false)G.errors++;
+  noteWord(G.R[G.ri],false);
   oops();shakeStage();
   say(G.fails>=2&&!$("listen").hidden?"Bấm “🔊 Nghe mẫu” rồi đọc theo nhé!":"Gần đúng rồi, đọc lại nào!");
   if(G.fails>=2)$("listen").classList.add("hint");

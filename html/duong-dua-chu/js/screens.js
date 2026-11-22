@@ -24,7 +24,8 @@ function updateTotals(){$("totalStars").textContent=totalStars()}
 function renderHome(){
   updateTotals();
   const n=lessons().length*3;
-  $("modes").innerHTML=MODES.map((m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${n}</span></button>`).join("");
+  const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${n}</span></button>`;
+  $("modes").innerHTML=MODE_GROUPS.map(g=>`<h3 class="grpT">${g[1]}</h3>`+MODES.map((m,i)=>m.grp===g[0]?card(m,i):"").join("")).join("");
 }
 function openPick(m,silent){
   curMode=m;const M=MODE(m);
@@ -33,7 +34,8 @@ function openPick(m,silent){
   if(!silent&&S.voice)speakVi(M.say+" Bé chọn một bài nhé.");
 }
 function renderPick(){
-  $("lessonGrid").innerHTML=lessons().map((l,i)=>{
+  const wl=!MODE(curMode).noWeak&&weakLesson(),ws=wl?prog["weak|"+curMode]||0:0;
+  $("lessonGrid").innerHTML=(wl?`<div class="lcWrap"><button class="lessonCard weak" data-l="weak"><span class="li">📒</span><b>Từ khó của bé</b><small>${weakWords().length} từ cần luyện</small>${starRow(ws)}</button></div>`:"")+lessons().map((l,i)=>{
     const st=prog[l.id+"|"+curMode]||0,mine=l.id.charAt(0)==="u";
     return `<div class="lcWrap"><button class="lessonCard" data-l="${esc(l.id)}" ${i===0?"data-primary":""}><span class="num">${i+1}</span><span class="li">${esc(l.icon)}</span><b>${esc(l.t)}</b>${starRow(st)}${mine?'<span class="mine">Bài tự tạo</span>':""}</button>${mine?`<button class="editBtn" data-e="${esc(l.id)}" aria-label="Sửa bài ${esc(l.t)}">✏️</button>`:""}</div>`;
   }).join("")+`<button class="lessonCard add" id="addLesson"><span class="li">➕</span><b>Tạo bài mới</b></button>`;

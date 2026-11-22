@@ -1,4 +1,4 @@
-/* data.js — Dữ liệu tĩnh: BUILTIN (bài mẫu), MODES (5 trò), CARS (xe + mốc sao), ICONS, BALLOON, COMMON (từ nhiễu), PRAISE, STAR/CAR_SVG/FACE_SVG. */
+/* data.js — Dữ liệu tĩnh: BUILTIN (bài mẫu), MODES (8 trò, chia nhóm MODE_GROUPS), PICS (từ → emoji), ONSETS/ONSETS_EASY (âm đầu), TONES (6 dấu), CARS (xe + mốc sao), ICONS, BALLOON, COMMON (từ nhiễu), PRAISE, STAR/CAR_SVG/FACE_SVG. */
 /* =====================================================================
    DỮ LIỆU
    ===================================================================== */
@@ -12,13 +12,34 @@ const BUILTIN=[
  {id:"b7",icon:"🌊",t:"Đi biển",x:"Hè này bé đi biển. Sóng vỗ rì rào. Bé xây lâu đài cát."},
  {id:"b8",icon:"🎂",t:"Sinh nhật",x:"Hôm nay là sinh nhật bé. Mẹ mua bánh kem. Cả nhà hát mừng bé."}
 ];
+/* thứ tự trong MODES = thứ tự trên trang chủ = phím số 1–8 trên remote. grp: "chu" (Học chữ) | "doc" (Đọc to).
+   selfSay: trò tự đọc hướng dẫn kèm từ đầu tiên. noWeak: không hiện thẻ "Từ khó" (trò cần câu dài). */
 const MODES=[
- {id:"race",icon:"🏎️",name:"Đua từng từ",desc:"Đọc từng từ để xe chạy về đích",say:"Bé đọc to từng từ. Đọc đúng là xe chạy!",col:"#ff4d4d"},
- {id:"sentence",icon:"🚂",name:"Đọc cả câu",desc:"Đọc trọn từng câu thật trơn tru",say:"Bé đọc to cả câu nhé. Đọc hết câu là xe chạy!",col:"#2d8cff"},
- {id:"quick",icon:"⚡",name:"Đọc nhanh",desc:"Đọc từ trước khi hết giờ",say:"Từ hiện ra, bé đọc thật nhanh trước khi hết giờ nhé!",col:"#f08a00"},
- {id:"balloon",icon:"🎈",name:"Bắt bóng chữ",desc:"Nghe từ rồi chạm đúng quả bóng",say:"Bé nghe máy đọc, rồi chạm vào quả bóng có từ đúng nhé.",col:"#e8457f"},
- {id:"fill",icon:"🧩",name:"Tìm từ còn thiếu",desc:"Chọn từ đúng rồi đọc cả câu",say:"Câu bị thiếu một từ. Bé chọn từ đúng, rồi đọc to cả câu nhé.",col:"#8a4de8"}
+ {id:"picture",icon:"🖼️",name:"Nối chữ với hình",desc:"Đọc chữ rồi chọn đúng hình",say:"Bé đọc chữ rồi chọn hình đúng, hoặc nhìn hình rồi chọn chữ đúng nhé.",col:"#12a36f",grp:"chu"},
+ {id:"spell",icon:"🧱",name:"Ghép vần",desc:"Ghép âm đầu, vần và dấu thành chữ",say:"Bé nghe máy đọc một tiếng, rồi chọn âm đầu, vần và dấu để ghép thành chữ nhé.",col:"#1595c4",grp:"chu",selfSay:1},
+ {id:"tone",icon:"🎵",name:"Dấu nào đây?",desc:"Nghe rồi chọn chữ có dấu đúng",say:"Bé nghe máy đọc, rồi chọn chữ có dấu thanh đúng nhé.",col:"#c24bd6",grp:"chu",selfSay:1},
+ {id:"balloon",icon:"🎈",name:"Bắt bóng chữ",desc:"Nghe từ rồi chạm đúng quả bóng",say:"Bé nghe máy đọc, rồi chạm vào quả bóng có từ đúng nhé.",col:"#e8457f",grp:"chu",selfSay:1},
+ {id:"race",icon:"🏎️",name:"Đua từng từ",desc:"Đọc từng từ để xe chạy về đích",say:"Bé đọc to từng từ. Đọc đúng là xe chạy!",col:"#ff4d4d",grp:"doc"},
+ {id:"sentence",icon:"🚂",name:"Đọc cả câu",desc:"Đọc trọn từng câu thật trơn tru",say:"Bé đọc to cả câu nhé. Đọc hết câu là xe chạy!",col:"#2d8cff",grp:"doc",noWeak:1},
+ {id:"quick",icon:"⚡",name:"Đọc nhanh",desc:"Đọc từ trước khi hết giờ",say:"Từ hiện ra, bé đọc thật nhanh trước khi hết giờ nhé!",col:"#f08a00",grp:"doc"},
+ {id:"fill",icon:"🧩",name:"Tìm từ còn thiếu",desc:"Chọn từ đúng rồi đọc cả câu",say:"Câu bị thiếu một từ. Bé chọn từ đúng, rồi đọc to cả câu nhé.",col:"#8a4de8",grp:"doc",noWeak:1}
 ];
+const MODE_GROUPS=[["chu","🔤 Học chữ"],["doc","🎤 Đọc to"]];
+/* Kho từ có hình (trò Nối chữ với hình) — vốn từ lớp 1, một tiếng; chỉ dùng emoji phổ biến (Unicode ≤ 11) để TV cũ hiện được.
+   Mỗi emoji chỉ dùng cho một từ, để không có hai đáp án đúng. */
+const PICS={
+ "cá":"🐟","gà":"🐔","mèo":"🐱","chó":"🐶","bò":"🐄","lợn":"🐷","vịt":"🦆","chim":"🐦","ếch":"🐸","rùa":"🐢","thỏ":"🐰","voi":"🐘","khỉ":"🐒","hổ":"🐯","ong":"🐝","bướm":"🦋","kiến":"🐜","cua":"🦀","tôm":"🦐","ngựa":"🐴","dê":"🐐","cừu":"🐑","rắn":"🐍","gấu":"🐻","cú":"🦉",
+ "hoa":"🌸","cây":"🌳","lá":"🍃","nấm":"🍄","rau":"🥬",
+ "táo":"🍎","cam":"🍊","chuối":"🍌","nho":"🍇","dưa":"🍉","bánh":"🍰","kẹo":"🍬","sữa":"🥛","trứng":"🥚","cơm":"🍚","ngô":"🌽","dừa":"🥥","lê":"🍐","kem":"🍦","bún":"🍜",
+ "mưa":"🌧️","nắng":"☀️","trăng":"🌙","sao":"⭐","mây":"☁️","biển":"🌊","núi":"⛰️","lửa":"🔥","cát":"🏖️",
+ "nhà":"🏠","xe":"🚗","tàu":"🚂","thuyền":"⛵","ô":"☂️","mũ":"🧢","áo":"👕","giày":"👟","sách":"📖","bút":"✏️","cặp":"🎒","bóng":"⚽","đèn":"💡","kéo":"✂️","quà":"🎁","đàn":"🎸","trống":"🥁","đồng":"⏰",
+ "mẹ":"👩","bố":"👨","bé":"👶","bà":"👵","ông":"👴","tay":"✋","mắt":"👀","tai":"👂","mũi":"👃","tim":"❤️"
+};
+/* âm đầu: dài trước ngắn sau để "ngh" không bị nhận nhầm thành "ng" */
+const ONSETS=["ngh","ng","gh","gi","kh","nh","ph","th","tr","ch","qu","b","c","d","đ","g","h","k","l","m","n","p","r","s","t","v","x"];
+const ONSETS_EASY=["b","c","d","đ","g","h","l","m","n","s","t","v","x","nh","ch","th","tr","ng","kh","ph"];
+/* 6 dấu thanh: k = dấu kết hợp Unicode (NFD) */
+const TONES=[{k:"",n:"ngang"},{k:"\u0301",n:"sắc"},{k:"\u0300",n:"huyền"},{k:"\u0309",n:"hỏi"},{k:"\u0303",n:"ngã"},{k:"\u0323",n:"nặng"}];
 const CARS=[{c:"#ff4d4d",need:0},{c:"#2d8cff",need:0},{c:"#2fb35a",need:0},{c:"#ff9f1c",need:5},{c:"#b05cff",need:12},{c:"#ff5fa2",need:20},{c:"#14b8a6",need:30},{c:"#3a3f55",need:45}];
 const ICONS=["📖","🐶","🐱","🐟","🐥","🦋","🌸","🌳","🌧️","☀️","🏠","🎒","🚗","🍎","🎂","⚽","🌊","🚀"];
 const BALLOON=["#e8457f","#2d7be0","#8a4de8","#e07b00","#1f9e55","#d63a3a"];

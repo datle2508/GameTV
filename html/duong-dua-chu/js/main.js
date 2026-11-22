@@ -20,7 +20,7 @@ $("lessonGrid").addEventListener("click",e=>{
 $("stageBody").addEventListener("click",e=>{
   if(e.target.closest("#qgo")){IMPL.quick.begin();return}
   const bl=e.target.closest("[data-b]");if(bl&&G.mode==="balloon"){IMPL.balloon.tap(+bl.getAttribute("data-b"),bl);return}
-  const ch=e.target.closest("[data-c]");if(ch&&G.mode==="fill")IMPL.fill.pick(+ch.getAttribute("data-c"),ch);
+  const ch=e.target.closest("[data-c]");if(ch&&!G.over&&IMPL_().pick)IMPL_().pick(+ch.getAttribute("data-c"),ch);
 });
 $("mic").addEventListener("click",()=>{if(listening)stopListen();else startListen()});
 $("ok").addEventListener("click",()=>{if(!G.over)IMPL_().ok()});
@@ -59,7 +59,8 @@ $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+$("weakClear").addEventListener("click",()=>{if(window.confirm("Xoá danh sách từ khó của bé?")){clearWeak();toast("Đã xoá")}});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
 /* ---------- điều khiển TV (remote) / bàn phím ----------
