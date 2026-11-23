@@ -1,4 +1,4 @@
-/* util.js — Tiện ích: $, esc, rnd, shuffle, fmt, store (localStorage ddc_*), toast; chuẩn hoá chữ norm/clean/fold/lev/same; S (cài đặt); parse, uniqWords, choicesFor; users/lessons/findLesson/MODE; prog/totalStars/modeStars/starRow/dropProgress. */
+/* util.js — Tiện ích: $, esc, rnd, shuffle, fmt, store (localStorage ddc_*, dữ liệu riêng từng bé qua pk), toast; hồ sơ KIDS/KID/LEVEL, DUO/CUP, curP/kid/praise; chuẩn hoá chữ norm/clean/fold/lev/same; S (cài đặt); parse, uniqWords, choicesFor; users/lessons/findLesson/MODE; prog/totalStars/modeStars/starRow/dropProgress. */
 /* =====================================================================
    TIỆN ÍCH
    ===================================================================== */
@@ -7,7 +7,11 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
 const fmt=ms=>{const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
-const store={get(k,d){try{const v=localStorage.getItem("ddc_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ddc_"+k,JSON.stringify(v))}catch(e){}}};
+/* dữ liệu riêng của từng bé: bé đầu tiên (k1) giữ khoá cũ "ddc_prog"…, bé khác thêm tiền tố "ddc_<id>.prog" */
+let KID=null;   // bé đang chơi, gán bên dưới sau khi đọc KIDS
+const PERKID=/^(prog|weak|rw|log|ghost_|car|deco|time)/;
+const pk=(k,id)=>{id=id||(KID&&KID.id)||"k1";return PERKID.test(k)&&id!=="k1"?id+"."+k:k};
+const store={get(k,d,id){try{const v=localStorage.getItem("ddc_"+pk(k,id));return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v,id){try{localStorage.setItem("ddc_"+pk(k,id),JSON.stringify(v))}catch(e){}}};
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),1800)}
 
 /* \p{L} làm cả script lỗi cú pháp trên trình duyệt cũ (Chrome < 64), nên tạo regex có dự phòng */
@@ -21,11 +25,21 @@ const fold=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d
 function lev(a,b){if(Math.abs(a.length-b.length)>1)return 2;let p=[];for(let j=0;j<=b.length;j++)p[j]=j;for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
 
 /* cài đặt bố mẹ */
-const S=Object.assign({kidName:"",quickSec:6,strict:false,sfx:true,voice:true},store.get("settings",{}));
+const S=Object.assign({quickSec:6,limit:0,music:false,pack:true,strict:false,sfx:true,voice:true},store.get("settings",{}));
 const saveS=()=>store.set("settings",S);
-/* tên bé (bố mẹ đặt ở Góc bố mẹ): kid() → "Na" hoặc "bé"; praise() → lời khen, thỉnh thoảng gọi tên */
-const kid=()=>S.kidName||"bé";
-const praise=()=>{const p=rnd(PRAISE);return S.kidName&&Math.random()<0.5?p.replace(/!$/,"")+", "+S.kidName+"!":p};
+/* hồ sơ các bé: KIDS [{id,name,g:"boy"|"girl"|"",lv:"mam"|"l1"|"l2",av}], KID = bé đang chơi (ddc_kid).
+   DUO = hai bé chơi cùng {a,b,turn,res} · CUP = giải đua 3 chặng {list,i,stars} (journey.js, kids.js) */
+let KIDS=store.get("kids",null),DUO=null,CUP=null;
+if(!Array.isArray(KIDS)||!KIDS.length){KIDS=[{id:"k1",name:S.kidName||"",g:"",lv:"l1",av:"🐥"}];store.set("kids",KIDS)}
+if("kidName" in S){delete S.kidName;saveS()}   // bản trước lưu tên bé trong cài đặt
+KID=KIDS.find(k=>k.id===store.get("kid","k1"))||KIDS[0];
+document.documentElement.setAttribute("data-kid",KID.g||"");
+const LEVEL=()=>LEVELS.find(l=>l.id===KID.lv)||LEVELS[1];
+/* bé đang tới lượt (lượt 2 khi chơi đôi là bé kia) — kid() → tên hoặc "bé"; praise() → lời khen, thỉnh thoảng gọi tên */
+const curP=()=>DUO&&DUO.turn===1?DUO.b:KID;
+const kid=()=>curP().name||"bé";
+const Kid=()=>curP().name||"Bé";   // đầu câu
+const praise=()=>{const p=rnd(PRAISE),n=curP().name;return n&&Math.random()<0.5?p.replace(/!$/,"")+", "+n+"!":p};
 
 /* khớp mềm: đúng hẳn, hoặc chỉ sai dấu thanh (máy hay nghe nhầm), hoặc lệch 1 chữ cái với từ dài.
    Chế độ "chặt" (bố mẹ bật): phải đúng hẳn cả dấu. */

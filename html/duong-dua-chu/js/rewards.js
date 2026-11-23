@@ -1,8 +1,10 @@
-/* rewards.js — Động lực & theo dõi: STICKERS (30), rw (sticker đã có, số trò mỗi ngày, chuỗi ngày), plog (nhật ký mỗi lượt chơi); rewardFinish(stars,ms) gọi từ finish() → danh sách lời khen thêm; renderMission (trang chủ), renderAlbum (màn album), renderReport (Góc bố mẹ). Lưu ddc_rw, ddc_log. */
+/* rewards.js — Động lực & theo dõi: STICKERS (30), rw (sticker đã có, số trò mỗi ngày, chuỗi ngày), plog (nhật ký mỗi lượt chơi); rewardFinish(stars,ms) gọi từ finish() → danh sách lời khen thêm; renderMission (trang chủ, có thú cưng petNow), renderAlbum (màn album, gọi renderBadges ở journey.js), renderReport (Góc bố mẹ). Lưu ddc_rw, ddc_log. */
 const STICKERS=["🦁","🐼","🦊","🐨","🐸","🦄","🐙","🦋","🐳","🦖","🐬","🦜","🌈","🚀","🎈","🍭","🍓","🍩","⚽","🎨","🎵","🏆","👑","💎","🌟","🍀","🌻","🐞","🦀","🐧"];
 const MISSION=3;   // số trò mỗi ngày để xong nhiệm vụ
 let rw=Object.assign({st:[],days:{},streak:0,last:""},store.get("rw",{}));
 let plog=store.get("log",[]);
+/* bộ đếm cho huy hiệu: n lượt chơi, n3 lần 3 sao, md số ngày xong nhiệm vụ (nuôi thú cưng), best chuỗi ngày dài nhất, bd huy hiệu đã có, cups {g,s,b}, duo số ván chơi đôi */
+if(rw.n==null){rw.n=plog.length;rw.n3=Object.keys(prog).filter(k=>prog[k]===3).length;rw.md=Object.keys(rw.days).filter(k=>rw.days[k]>=MISSION).length;rw.best=rw.streak;rw.bd=[];rw.cups={g:0,s:0,b:0};rw.duo=0}
 const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const today=()=>ymd(new Date());
 const dayShift=n=>{const d=new Date();d.setDate(d.getDate()+n);return ymd(d)};
@@ -12,10 +14,11 @@ function streakNow(){return rw.last===today()||rw.last===dayShift(-1)?rw.streak:
 /* gọi mỗi khi xong một lượt chơi; trả về các dòng thưởng để hiện trên màn kết quả */
 function rewardFinish(stars,ms){
   const d=today(),out=[];
-  if(rw.last!==d){rw.streak=rw.last===dayShift(-1)?rw.streak+1:1;rw.last=d;if(rw.streak>=2)out.push(`🔥 Bé chơi ${rw.streak} ngày liên tiếp!`)}
+  rw.n++;if(stars===3)rw.n3++;
+  if(rw.last!==d){rw.streak=rw.last===dayShift(-1)?rw.streak+1:1;rw.last=d;rw.best=Math.max(rw.best||0,rw.streak);if(rw.streak>=2)out.push(`🔥 Bé chơi ${rw.streak} ngày liên tiếp!`)}
   rw.days[d]=(rw.days[d]||0)+1;
   if(stars===3){const s=newSticker();if(s)out.push(`Nhận sticker mới <span class="stk">${s}</span>`)}
-  if(rw.days[d]===MISSION){const s=newSticker();out.push(`🎯 Xong nhiệm vụ hôm nay!`+(s?` Thưởng <span class="stk">${s}</span>`:""))}
+  if(rw.days[d]===MISSION){rw.md=(rw.md||0)+1;const s=newSticker();out.push(`🎯 Xong nhiệm vụ hôm nay!`+(s?` Thưởng <span class="stk">${s}</span>`:""))}
   const old=dayShift(-60);Object.keys(rw.days).forEach(k=>{if(k<old)delete rw.days[k]});
   store.set("rw",rw);
   plog.push({d,m:G.mode,s:stars,t:Math.round(ms/1000)});if(plog.length>800)plog=plog.slice(-800);
@@ -26,14 +29,19 @@ function rewardFinish(stars,ms){
 function renderMission(){
   const el=$("mission");if(!el)return;
   const n=Math.min(rw.days[today()]||0,MISSION),st=streakNow();
-  el.innerHTML=`<div class="mtxt">🎯 <b>Nhiệm vụ hôm nay:</b> chơi ${MISSION} trò ${n>=MISSION?"— xong rồi! 🎉":`(${n}/${MISSION})`}</div>`+
-    `<div class="mbar"><i style="width:${Math.round(n/MISSION*100)}%"></i></div>`+(st>=2?`<div class="mfire">🔥 ${st} ngày liên tiếp</div>`:"");
+  const p=petNow();
+  el.innerHTML=`<span class="pet" aria-hidden="true">${p.cur[0]}</span><div class="mtxt">🎯 <b>Nhiệm vụ hôm nay:</b> chơi ${MISSION} trò ${n>=MISSION?"— xong rồi! 🎉":`(${n}/${MISSION})`}</div>`+
+    `<div class="mbar"><i style="width:${Math.round(n/MISSION*100)}%"></i></div>`+(st>=2?`<div class="mfire">🔥 ${st} ngày liên tiếp</div>`:"")+
+    `<div class="mpet">${p.cur[2]}${p.next?` · còn ${p.next[1]-p.md} ngày xong nhiệm vụ nữa là lớn`:" · lớn hết cỡ rồi!"}</div>`;
   $("albumCount").textContent=`${rw.st.length}/${STICKERS.length} sticker`;
 }
 function renderAlbum(){
-  $("albumSub").textContent=`${S.kidName||"Bé"} có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
+  $("albumSub").textContent=`${KID.name||"Bé"} có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
   $("stickers").innerHTML=STICKERS.map(s=>rw.st.indexOf(s)>=0?`<span class="sticker">${s}</span>`:'<span class="sticker no">❔</span>').join("");
+  renderBadges();
 }
+/* thú cưng: lớn lên theo số ngày bé xong nhiệm vụ (rw.md) */
+function petNow(){const md=rw.md||0;let i=0;while(i+1<PET.length&&md>=PET[i+1][1])i++;return {md,cur:PET[i],next:PET[i+1]}}
 
 /* Góc bố mẹ: 7 ngày gần nhất — số lượt chơi mỗi ngày, tổng thời gian, trò hay chơi, sao trung bình */
 function renderReport(){

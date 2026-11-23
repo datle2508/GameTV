@@ -15,6 +15,7 @@
 <header class="top">
   <button class="ib" id="homeBtn" aria-label="Về trang chủ" style="visibility:hidden">🏠</button>
   <h1 class="logo">Đường đua <span>chữ</span></h1>
+  <button class="pill kidPill" id="kidBtn" aria-label="Đổi bé đang chơi"><span id="kidAv">🐥</span><b id="kidNm">Bé</b></button>
   <button class="pill" id="starsBtn" aria-label="Sao của bé, mở gara xe">⭐ <b id="totalStars">0</b></button>
   <button class="ib" id="parentBtn" aria-label="Góc bố mẹ">👪</button>
 </header>
@@ -26,14 +27,28 @@
     <div class="bubble" id="heroMsg">Chào bé! Hôm nay mình chơi trò gì nào?</div>
     <button class="say" id="heroSay" aria-label="Nghe lời chào">🔊</button>
   </div>
-  <button class="card mission" id="mission" aria-label="Nhiệm vụ hôm nay, mở album sticker"></button>
-  <h2 class="sec">Chọn trò chơi</h2>
-  <div class="modes" id="modes"></div>
-  <div class="extras">
-    <button class="bigBtn" id="albumBtn"><span class="e">🏅</span><span>Album sticker<small id="albumCount"></small></span></button>
-    <button class="bigBtn" id="garageBtn"><span class="e">🚗</span><span>Gara xe<small>Chọn xe, mở khoá xe mới</small></span></button>
-    <button class="bigBtn" id="newBtn"><span class="e">✏️</span><span>Tạo bài mới<small>Bố mẹ và bé tự soạn bài đọc</small></span></button>
+  <div class="subTabs" id="subTabs" role="tablist"></div>
+  <div class="duoBar" id="duoBar" hidden><span id="duoTxt"></span><button class="btn ghost" id="duoOff">Thôi chơi đôi</button></div>
+  <button class="bigBtn pathBtn" id="pathBtn" data-primary></button>
+  <button class="mission" id="mission" aria-label="Nhiệm vụ hôm nay, mở album sticker"></button>
+  <div class="grpGrid" id="groups"></div>
+  <div class="miniBar">
+    <button class="mini" id="mapBtn"><span>🗺️</span>Lộ trình</button>
+    <button class="mini" id="albumBtn"><span>🏅</span>Album<small id="albumCount"></small></button>
+    <button class="mini" id="garageBtn"><span>🚗</span>Gara xe</button>
+    <button class="mini" id="cupBtn"><span>🏆</span>Giải đua</button>
+    <button class="mini" id="kidsBtn2"><span>👫</span>Chơi đôi</button>
+    <button class="mini" id="newBtn"><span>✏️</span>Tạo bài</button>
   </div>
+</section>
+
+<!-- ========== NHÓM TRÒ ========== -->
+<section class="screen" id="group">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <div class="grow"><h2 id="grpTitle"></h2><small id="grpSub"></small></div>
+  </div>
+  <div class="modes" id="modes"></div>
 </section>
 
 <!-- ========== CHỌN BÀI ========== -->
@@ -93,6 +108,43 @@
   <section class="card strip" id="strip"><div class="words" id="words"></div></section>
 </section>
 
+<!-- ========== LỘ TRÌNH (journey.js) ========== -->
+<section class="screen" id="path">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">🗺️</span>
+    <div class="grow"><h2>Lộ trình học</h2><small id="pathSub"></small></div>
+  </div>
+  <div class="pathMap" id="pathMap"></div>
+</section>
+
+<!-- ========== CÁC BÉ (kids.js) ========== -->
+<section class="screen" id="kids">
+  <div class="head">
+    <button class="ib" data-back aria-label="Quay lại">⬅️</button>
+    <span class="hi">👧👦</span>
+    <div class="grow"><h2 id="kidsTitle">Các bé trong nhà</h2><small id="kidsSub"></small></div>
+  </div>
+  <div class="lessonGrid" id="kidGrid"></div>
+  <div class="extras"><button class="bigBtn" id="duoBtn"><span class="e">👫</span><span>Hai bé chơi cùng nhau<small>Thay phiên chơi một trò, rồi so sao</small></span></button></div>
+  <div class="card form" id="kidForm" hidden>
+    <h2 class="sec" id="kfHead">Thêm bé mới</h2>
+    <div class="fl">Bé là<div class="seg" id="kfG"></div></div>
+    <label class="fl">Tên của bé
+      <input id="kfName" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Gõ tên, hoặc chọn một tên bên dưới">
+    </label>
+    <div class="seg" id="kfNames"></div>
+    <div class="fl">Cấp độ<div class="seg" id="kfLv"></div></div>
+    <div class="fl">Hình của bé<div class="icons" id="kfAv"></div></div>
+    <p class="note">Cấp độ chọn lộ trình học, tốc độ trò Đọc nhanh/Mưa chữ và độ chặt khi chấm dấu thanh (bố mẹ vẫn chỉnh lại được trong Góc bố mẹ).</p>
+    <div class="btnRow">
+      <button class="btn green" id="kfSave">💾 Lưu</button>
+      <button class="btn ghost" id="kfCancel">Huỷ</button>
+      <button class="btn red" id="kfDel">🗑 Xoá bé này</button>
+    </div>
+  </div>
+</section>
+
 <!-- ========== SOẠN BÀI ========== -->
 <section class="screen" id="editor">
   <div class="head">
@@ -108,6 +160,11 @@
     <label class="fl">Đoạn văn cho bé đọc
       <textarea id="edText" maxlength="800" placeholder="Nhà em có con mèo. Mèo có bộ lông mềm. Mèo thích nằm sưởi nắng."></textarea>
     </label>
+    <div class="btnRow">
+      <button class="btn ghost" id="edPhoto">📷 Tạo bài từ ảnh trang sách (AI)</button>
+      <input type="file" id="edFile" accept="image/*" hidden>
+    </div>
+    <p class="note" id="edAi" hidden aria-live="polite"></p>
     <div class="tips">💡 Mỗi câu kết thúc bằng dấu chấm. Câu ngắn 4–8 từ, dùng từ bé đã học. Vừa sức: 3–6 câu.</div>
     <div class="preview" id="edPreview"></div>
     <div class="btnRow">
@@ -123,11 +180,17 @@
   <div class="head">
     <button class="ib" data-back aria-label="Quay lại">⬅️</button>
     <span class="hi">🏅</span>
-    <div class="grow"><h2>Album sticker</h2><small id="albumSub"></small></div>
+    <div class="grow"><h2>Album của bé</h2><small id="albumSub"></small></div>
   </div>
+  <div class="card petCard" id="petCard"></div>
   <div class="card">
     <div class="stickers" id="stickers"></div>
-    <p class="note">Mỗi lần được 3 ⭐, bé nhận 1 sticker mới. Chơi đủ 3 trò trong ngày (nhiệm vụ hôm nay) được thưởng thêm 1 sticker.</p>
+    <p class="note">Mỗi lần được 3 ⭐, bé nhận 1 sticker mới. Chơi đủ 3 trò trong ngày (nhiệm vụ hôm nay) được thưởng thêm 1 sticker và thú cưng lớn thêm.</p>
+  </div>
+  <div class="card">
+    <h2 class="sec">🏅 Huy hiệu</h2>
+    <div class="badges" id="badges"></div>
+    <p class="note" id="cupLine"></p>
   </div>
 </section>
 
@@ -139,6 +202,8 @@
   </div>
   <div class="garageGrid" id="garageGrid"></div>
   <p class="nextUnlock" id="garageNext"></p>
+  <h2 class="sec">✨ Trang trí xe</h2>
+  <div class="garageGrid" id="decoGrid"></div>
 </section>
 
 <!-- ========== BỐ MẸ ========== -->
@@ -150,12 +215,9 @@
   </div>
   <div class="card">
     <div class="setGroup">
-      <h3>👧 Tên của bé</h3>
-      <div class="btnRow">
-        <input id="kidIn" class="keyin" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Ví dụ: Na, Bin, Su…" aria-label="Tên của bé">
-        <button class="btn" id="kidSave">Lưu tên</button>
-      </div>
-      <p class="note">Máy sẽ gọi tên bé khi chào và khen.</p>
+      <h3>👧👦 Các bé</h3>
+      <div class="btnRow"><button class="btn" id="pKids">Đặt tên, bé trai/bé gái, cấp độ, thêm bé</button></div>
+      <p class="note">Mỗi bé có sao, sticker, từ khó và lộ trình riêng. Máy gọi tên bé khi chào và khen.</p>
     </div>
     <div class="setGroup">
       <h3>🗣 Giọng đọc mẫu</h3>
@@ -210,6 +272,8 @@
     <div class="setGroup">
       <h3>📊 Bé đã chơi (7 ngày qua)</h3>
       <div id="report"></div>
+      <div class="btnRow"><button class="btn ghost" id="shareRep">📤 Gửi báo cáo tuần (Zalo, email…)</button></div>
+      <textarea id="repText" class="keyin repText" readonly hidden aria-label="Báo cáo tuần"></textarea>
     </div>
     <div class="setGroup">
       <h3>📒 Từ bé hay sai</h3>
@@ -218,7 +282,9 @@
     </div>
     <div class="setGroup">
       <h3>📚 Bài học</h3>
-      <div class="btnRow"><button class="btn" id="pNew">✏️ Tạo bài mới</button><button class="btn red" id="pReset">Xoá hết sao của bé</button></div>
+      <div class="btnRow"><button class="btn" id="pNew">✏️ Tạo bài mới</button><button class="btn ghost" id="pExport">📋 Chép các bài tự tạo</button><button class="btn red" id="pReset">Xoá hết sao của bé</button></div>
+      <p class="note">“Chép các bài tự tạo”: gửi đoạn chép được cho người làm game để thêm thành bài mẫu có giọng đọc thu sẵn trên mọi máy.</p>
+      <textarea id="expText" class="keyin repText" readonly hidden aria-label="Các bài tự tạo"></textarea>
     </div>
     <p class="note">Micro nhận giọng nói tiếng Việt chạy tốt nhất trên Chrome hoặc Edge máy tính (cần mạng). Trên Safari cần bật Đọc chính tả của macOS. Nếu máy không có micro, bé đọc to và bố mẹ bấm “✔️ Bố mẹ chấm đúng”. Trò “Bắt bóng chữ” không cần micro, chỉ cần loa.<br>Nếu giọng đọc nghe như người nước ngoài: máy chưa có giọng tiếng Việt. Trên Mac vào Cài đặt hệ thống → Trợ năng → Nội dung được đọc → Giọng hệ thống → Quản lý giọng → tải giọng “Linh”. Trên Windows vào Cài đặt → Thời gian và ngôn ngữ → Giọng nói → thêm tiếng Việt.</p>
   </div>
@@ -248,6 +314,18 @@
     <div class="btnRow"><button class="btn ghost" id="gateClose">Đóng</button></div>
   </div>
 </div>
+<!-- hết giờ chơi (kids.js) -->
+<div class="over" id="limitOv">
+  <div class="win" role="dialog" aria-labelledby="limitT">
+    <div class="pic sm">⏰</div>
+    <h2 id="limitT">Hết giờ chơi rồi!</h2>
+    <p class="rinfo" id="limitTxt"></p>
+    <div class="btnRow">
+      <button class="btn green" id="limitHome">🏠 Về trang chủ</button>
+      <button class="btn ghost" id="limitMore">Bố mẹ cho thêm 10 phút</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
 <!-- thứ tự nạp quan trọng: xem CLAUDE.md -->
@@ -263,7 +341,13 @@
 <script src="js/letters.js"></script>
 <script src="js/meaning.js"></script>
 <script src="js/arcade.js"></script>
+<script src="js/math.js"></script>
+<script src="js/more.js"></script>
+<script src="js/journey.js"></script>
+<script src="js/kids.js"></script>
 <script src="js/speech.js"></script>
+<script src="js/packdata.js"></script>
+<script src="js/pack.js"></script>
 <script src="js/voice.js"></script>
 <script src="js/main.js"></script>
 </body>

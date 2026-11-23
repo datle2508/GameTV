@@ -72,3 +72,25 @@
 .bar i{display:block;width:70%;min-height:3px;background:var(--blue);border-radius:8px 8px 0 0}
 .bar b{font-size:14px}
 .bar small{font-size:12px;color:var(--soft);font-weight:800;white-space:nowrap}
+
+/* ---------- huy hiệu, thú cưng, trang trí xe, chơi đôi, báo cáo ---------- */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.bdg{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:12px 8px;border-radius:20px;background:var(--wbg)}
+.bdg span{font-size:44px;line-height:1.1}
+.bdg b{font:800 18px/1.15 "Baloo 2",sans-serif}
+.bdg small{font-size:13px;color:var(--soft);font-weight:700}
+.bdg.no{opacity:.45}
+.petCard{display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.petCard b{display:block;font:800 26px "Baloo 2",sans-serif}
+.petCard small{font-size:16px;color:var(--soft);font-weight:700}
+.petBig{font-size:84px;line-height:1}
+.gslot.deco .de{font-size:58px;line-height:1.2}
+.gslot.locked .de{filter:grayscale(1);opacity:.4}
+.duoRes{display:flex;gap:10px;justify-content:center}
+.duoRes>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;border-radius:16px;background:var(--card)}
+.duoRes>div.win1{background:var(--rbg);box-shadow:inset 0 0 0 4px var(--sun)}
+.duoRes .av{font-size:44px;line-height:1.1}
+.duoRes small{font:700 14px Nunito,sans-serif}
+.repText{width:100%;min-height:170px;margin-top:10px;font-size:16px}
+@media(max-width:600px){.top{gap:7px}.ib,.pill{height:48px}.ib{width:46px;font-size:24px}.pill{padding:0 10px;font-size:22px}.logo{font-size:24px}.kidPill b{display:none}.kidPill{padding:0 8px}.mission{gap:6px 10px}.pathBtn{font-size:21px}.pstop{width:96%}}
+@media(max-width:600px){.grpGrid{grid-template-columns:1fr 1fr;gap:12px}.grpTile{min-height:150px;padding:12px 8px}.grpTile .gi{font-size:44px}.grpTile b{font-size:20px}.grpTile small{font-size:16px;letter-spacing:0}.mission .mpet{display:none}.subTab{min-height:54px}.mini{min-width:76px}}

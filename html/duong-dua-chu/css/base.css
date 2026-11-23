@@ -92,3 +92,75 @@ button:focus:not(:focus-visible){outline:none}
 .mbar{flex:1 1 160px;height:18px;border-radius:99px;background:var(--wbg);overflow:hidden;border:2px solid var(--line)}
 .mbar i{display:block;height:100%;background:var(--green);border-radius:99px}
 .mfire{font:800 19px "Baloo 2",sans-serif;color:var(--orange)}
+
+/* ---------- theo bé: nền hồng (bé gái) / xanh (bé trai), có bộ màu tối riêng ---------- */
+:root[data-kid=girl]{--bg:#fff3f8;--dot:#ffd9ea;--line:#f6d4e5}
+:root[data-kid=boy]{--bg:#eef6ff;--dot:#d5e7ff;--line:#cfe1f7}
+@media (prefers-color-scheme:dark){
+  :root[data-kid=girl]:not([data-theme=light]){--bg:#261a33;--dot:#3a2549;--line:#4b3460}
+  :root[data-kid=boy]:not([data-theme=light]){--bg:#141f3a;--dot:#1f2f57;--line:#2f4273}
+}
+:root[data-theme=dark][data-kid=girl]{--bg:#261a33;--dot:#3a2549;--line:#4b3460}
+:root[data-theme=dark][data-kid=boy]{--bg:#141f3a;--dot:#1f2f57;--line:#2f4273}
+:root[data-kid=girl] .logo{color:var(--pink)}
+:root[data-kid=girl] .logo span{color:var(--purple)}
+:root[data-kid=boy] .logo{color:var(--blue)}
+:root[data-kid=boy] .logo span{color:var(--green)}
+
+/* ---------- nút bé trên thanh trên, thanh chơi đôi, nút lộ trình ---------- */
+.kidPill{background:var(--card);color:var(--ink);border:3px solid var(--line);box-shadow:0 5px 0 var(--line);font-size:22px;max-width:220px}
+.kidPill b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.duoBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:12px;padding:12px 16px;border-radius:22px;background:var(--rbg);font:800 19px "Baloo 2",sans-serif}
+.duoBar span{flex:1 1 260px}
+.pathBtn{width:100%;margin-top:14px;border-color:var(--green);box-shadow:0 6px 0 var(--green);font-size:26px}
+.pathBtn .e{font-size:50px}
+.pet{font-size:46px;line-height:1}
+.mpet{flex-basis:100%;font:700 16px Nunito,sans-serif;color:var(--soft)}
+
+/* ---------- màn các bé ---------- */
+.kidCard{width:100%;min-height:176px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 10px;border-radius:26px;background:var(--card);border:4px solid var(--line);box-shadow:0 6px 0 var(--line);text-align:center}
+.kidCard b{font:800 22px "Baloo 2",sans-serif}
+.kidCard small{color:var(--soft);font-weight:700;font-size:15px}
+.kidCard[aria-pressed=true]{border-color:var(--green);box-shadow:0 6px 0 var(--green)}
+.kidCard.girl .kav{background:#ffe0ef}
+.kidCard.boy .kav{background:#dcecff}
+.kav{font-size:52px;line-height:1;width:84px;height:84px;border-radius:50%;background:var(--wbg);display:flex;align-items:center;justify-content:center}
+#kidForm{margin-top:20px}
+
+/* ---------- lộ trình: các chặng xếp so le như con đường ---------- */
+.pathMap{display:grid;gap:14px;max-width:680px;margin:0 auto;padding:6px 0 10px;background:linear-gradient(90deg,transparent calc(50% - 4px),var(--line) calc(50% - 4px),var(--line) calc(50% + 4px),transparent calc(50% + 4px))}
+.pnode{display:flex}
+.pnode.r{justify-content:flex-end}
+.pstop{position:relative;width:88%;display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:24px;background:var(--card);border:4px solid var(--line);box-shadow:0 6px 0 var(--line);text-align:left}
+.pstop.done{border-color:var(--green)}
+.pstop.cur{border-color:var(--mc);box-shadow:0 6px 0 var(--mc);animation:bob 1.4s ease-in-out infinite alternate}
+.pstop:disabled{opacity:.55}
+@keyframes bob{to{transform:translateY(-4px)}}
+.pn{flex:none;width:36px;height:36px;border-radius:50%;background:var(--mc);color:#fff;font:800 18px "Baloo 2",sans-serif;display:flex;align-items:center;justify-content:center}
+.pi{flex:none;font-size:40px;line-height:1}
+.pt{display:flex;flex-direction:column;gap:2px}
+.pt b{font:800 21px/1.1 "Baloo 2",sans-serif}
+.pt small{color:var(--soft);font-weight:700;font-size:15px}
+.pt small.go2{color:var(--green);font-weight:800}
+.pend{text-align:center;font:800 26px "Baloo 2",sans-serif;padding:10px;background:var(--bg);border-radius:20px;justify-self:center}
+
+/* ---------- trang chủ gọn: tab môn, ô nhóm trò, hàng nút nhỏ ---------- */
+.subTabs{display:flex;gap:12px;margin-top:14px}
+.subTab{flex:1;min-height:64px;border-radius:22px;background:var(--card);border:4px solid var(--line);box-shadow:0 5px 0 var(--line);font:800 clamp(20px,3.4vw,26px) "Baloo 2",sans-serif}
+.subTab[aria-pressed=true]{background:var(--sun);border-color:#d9a300;box-shadow:0 5px 0 #d9a300;color:#3a2a00}
+.mission{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;width:100%;margin:12px 0 0;padding:8px 14px;border-radius:20px;background:var(--card);border:3px solid var(--line);text-align:left;cursor:pointer}
+.mission .pet{font-size:34px}
+.mission .mtxt{font-size:17px}
+.mission .mbar{flex:1 1 120px;height:14px}
+.mission .mpet,.mission .mfire{font-size:14px}
+.grpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:18px}
+.grpTile{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 12px;border-radius:28px;background:var(--card);border:4px solid var(--mc);box-shadow:0 7px 0 var(--mc);text-align:center;min-height:190px;justify-content:center}
+.grpTile:active{transform:translateY(5px);box-shadow:0 2px 0 var(--mc)}
+.grpTile .gi{font-size:58px;line-height:1.1}
+.grpTile b{font:800 26px/1.1 "Baloo 2",sans-serif;color:var(--mc)}
+.grpTile small{font-size:20px;letter-spacing:2px}
+.grpTile .num{position:absolute;top:10px;left:12px;font:800 16px "Baloo 2",sans-serif;color:var(--soft)}
+.miniBar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+.mini{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:92px;padding:8px 10px;border-radius:18px;background:var(--card);border:3px solid var(--line);font:800 15px "Baloo 2",sans-serif;color:var(--soft)}
+.mini span{font-size:30px;line-height:1.1}
+.mini small{font:700 12px Nunito,sans-serif}

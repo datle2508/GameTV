@@ -1,4 +1,4 @@
-/* game.js — Lõi trò chơi: G (trạng thái), say, ctrl, setProgress, drawRoadStars, carMove, startGame, endGame, setRead/bump/heard/readFail/goodRead (khớp lời đọc), finish (chấm sao, mở khoá xe). */
+/* game.js — Lõi trò chơi: G (trạng thái), say, ctrl, setProgress, drawRoadStars, carMove, startGame(lid,mid,from), endGame, setRead/bump/heard/readFail/goodRead (khớp lời đọc), finish (chấm sao, mở khoá xe). */
 /* =====================================================================
    TRÒ CHƠI — phần chung
    ===================================================================== */
@@ -34,14 +34,19 @@ function startClock(){if(!G.t0){G.t0=Date.now();G.clockT=setInterval(()=>{$("clo
 function renderStrip(i){$("words").innerHTML=G.P.words.map((w,k)=>`<span class="w ${k<i?"done":k===i?"cur":""}">${esc(w.c)}</span>`).join("")}
 function focusMain(){const p=document.querySelector(".screen.on [data-primary]:not([hidden])");if(p)try{p.focus({preventScroll:true})}catch(e){p.focus()}}
 
-function startGame(lid,mid){
+/* from: "path" (lộ trình), "cup" (giải đua), "duo" (lượt tiếp theo khi chơi đôi); bỏ trống = chơi tự do */
+function startGame(lid,mid,from){
+  if(limitBlock())return;   // hết giờ chơi trong ngày (kids.js)
   endGame();
   const L=findLesson(lid);if(!L)return;
   curMode=mid;
-  G={mode:mid,lesson:L,P:parse(L.x),R:[],ri:0,base:0,skip:0,to:[],errors:0,fails:0,t0:0,over:false,step:0};
+  if(from!=="duo"&&DUO){DUO.turn=0;DUO.res=[]}   // ván đôi mới: bé thứ nhất chơi trước
+  if(from!=="cup")CUP=null;
+  G={mode:mid,lesson:L,P:parse(L.x),R:[],ri:0,base:0,skip:0,to:[],errors:0,fails:0,t0:0,over:false,step:0,from:from||""};
   stale=true;phraseToks=0;
   const M=MODE(mid);
-  $("pLesson").textContent=L.icon+" "+L.t;$("pMode").textContent=M.icon+" "+M.name;
+  $("pLesson").textContent=M.sub==="math"?`🔢 Toán · ${LEVEL().n.replace(/^\S+ /,"")}`:L.icon+" "+L.t;
+  $("pMode").textContent=M.icon+" "+M.name+(CUP?` · 🏆 Chặng ${CUP.i+1}/${CUP.list.length}`:"")+(DUO?` · Lượt của ${curP().av} ${curP().name||"bạn"}`:"");
   $("heard").textContent="";$("clock").textContent="0:00";$("listen").classList.remove("hint");
   $("strip").hidden=!(mid==="race"||mid==="sentence");
   $("stageBody").style.setProperty("--cc",M.col);   // màu nút lựa chọn theo trò
@@ -49,9 +54,11 @@ function startGame(lid,mid){
   show("play");
   IMPL[mid].init();
   if(S.voice&&!M.selfSay)speakVi(M.say);   // selfSay: trò tự đọc hướng dẫn kèm từ đầu tiên
+  if(DUO)toast(`Lượt của ${curP().av} ${curP().name||"bạn"}!`);
   focusMain();
 }
 function endGame(){
+  const I=G.mode&&IMPL[G.mode];if(I&&I.stop&&!G.stopped){G.stopped=true;try{I.stop()}catch(e){}}   // trò có micro ghi âm (echo)
   (G.to||[]).forEach(clearTimeout);G.to=[];
   clearInterval(G.tickT);clearInterval(G.clockT);clearInterval(G.ghostT);clearTimeout(finTimer);
   G.R=[];G.over=true;$("ghost").hidden=true;
@@ -89,14 +96,16 @@ function finish(){
   if(G.over)return;G.over=true;
   G.to.forEach(clearTimeout);G.to=[];clearInterval(G.tickT);clearInterval(G.clockT);clearInterval(G.ghostT);stopListen();
   const ms=G.t0?Date.now()-G.t0:0,stars=G.errors<=1?3:G.errors<=4?2:1;
+  const other=DUO&&DUO.turn===1;   // lượt của bé thứ hai: sao ghi vào hồ sơ bé đó, không thưởng vào hồ sơ đang mở
   const key=G.lesson.id+"|"+G.mode,before=totalStars(),old=+prog[key]||0;
-  if(stars>old){prog[key]=stars;store.set("prog",prog)}
+  if(other)creditKid(DUO.b,key,stars);else if(stars>old){prog[key]=stars;store.set("prog",prog)}
   const after=totalStars(),unl=CARS.filter(c=>c.need>before&&c.need<=after);
   setProgress(1,"🏁");carMove();
   $("rstars").innerHTML=[0,1,2].map(i=>`<svg class="${i<stars?"on":""}" style="animation-delay:${(.25+i*.25).toFixed(2)}s" viewBox="0 0 24 24"><path d="${STAR}"/></svg>`).join("");
-  $("rtitle").textContent=["","Hoàn thành","Giỏi lắm","Xuất sắc"][stars]+(S.kidName?", "+S.kidName:"")+"!";
-  $("rinfo").innerHTML=(ms>=1000?`⏱ ${fmt(ms)}`:"")+(after>before?`<br>⭐ +${after-before} sao`:"")+(stars<3?"<br>Chơi lại để được 3 sao nhé!":"");
-  let extra=rewardFinish(stars,ms);if(IMPL_().ghostFinish)extra=extra.concat(IMPL_().ghostFinish(ms));   // sticker, nhiệm vụ, xe bóng ma
+  $("rtitle").textContent=["","Hoàn thành","Giỏi lắm","Xuất sắc"][stars]+(curP().name?", "+curP().name:"")+"!";
+  $("rinfo").innerHTML=(ms>=1000?`⏱ ${fmt(ms)}`:"")+(!other&&after>before?`<br>⭐ +${after-before} sao`:"")+(stars<3&&!DUO&&!CUP?"<br>Chơi lại để được 3 sao nhé!":"");
+  let extra=other?[]:rewardFinish(stars,ms);if(!other&&IMPL_().ghostFinish)extra=extra.concat(IMPL_().ghostFinish(ms));   // sticker, nhiệm vụ, xe bóng ma
+  extra=extra.concat(flowFinish(stars,ms));   // chơi đôi, giải đua, lộ trình, huy hiệu (journey.js): thêm dòng và đổi nút
   $("runlock").innerHTML=(unl.length?`<div class="unlock">🎉 Mở khoá xe mới! ${unl.map(c=>`<span class="gcar sm" style="color:${c.c}">${CAR_SVG}</span>`).join("")}</div>`:"")+extra.map(x=>`<div class="unlock">${x}</div>`).join("");
   updateTotals();
   finTimer=setTimeout(()=>{$("over").classList.add("show");$("again").focus();fanfare();confetti();if(S.voice)speakVi($("rtitle").textContent)},900);

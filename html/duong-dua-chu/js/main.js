@@ -8,10 +8,12 @@ $("garageBtn").addEventListener("click",()=>{renderGarage();show("garage")});
 $("parentBtn").addEventListener("click",openGate);
 $("newBtn").addEventListener("click",()=>openEditor());
 $("pNew").addEventListener("click",()=>openEditor());
-$("heroSay").addEventListener("click",()=>speakVi($("heroMsg").textContent+" Bé chạm vào một trò để chơi nhé."));
-$("pickSay").addEventListener("click",()=>speakVi(MODE(curMode).say+" Bé chọn một bài nhé."));
+$("heroSay").addEventListener("click",()=>speakVi($("heroMsg").textContent+" "+Kid()+" chạm vào một trò để chơi nhé."));
+$("pickSay").addEventListener("click",()=>speakVi(MODE(curMode).say+" "+Kid()+" chọn một bài nhé."));
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",back));
 $("modes").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b)openPick(b.getAttribute("data-m"))});
+$("groups").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(b)openGroup(b.getAttribute("data-g"))});
+$("subTabs").addEventListener("click",e=>{const b=e.target.closest("[data-sub]");if(b)setSub(b.getAttribute("data-sub"))});
 $("lessonGrid").addEventListener("click",e=>{
   const ed=e.target.closest("[data-e]");if(ed){openEditor(ed.getAttribute("data-e"));return}
   if(e.target.closest("#addLesson")){openEditor();return}
@@ -26,20 +28,21 @@ $("stageBody").addEventListener("click",e=>{
 $("mic").addEventListener("click",()=>{if(listening)stopListen();else startListen()});
 $("ok").addEventListener("click",()=>{if(!G.over)IMPL_().ok()});
 $("listen").addEventListener("click",()=>{if(!G.over){const t=IMPL_().sample();if(t)speakVi(t)}});
-$("again").addEventListener("click",()=>startGame(G.lesson.id,G.mode));
+$("again").addEventListener("click",()=>startGame(G.lesson.id,G.mode,G.from==="path"?"path":""));
 $("next").addEventListener("click",()=>{
+  if(flowNext())return;   // chơi đôi, giải đua, lộ trình (journey.js)
   const src=MODE(G.mode).src,L=src==="stories"?STORIES:lessons(),i=L.findIndex(l=>l.id===G.lesson.id);
   startGame(src==="none"?"bank":L[(i+1)%L.length].id,G.mode)});
 $("albumBtn").addEventListener("click",()=>{renderAlbum();show("album")});
 $("mission").addEventListener("click",()=>{renderAlbum();show("album")});
-$("toHome").addEventListener("click",()=>show("home"));
+$("toHome").addEventListener("click",()=>openGroup(MODE(G.mode).grp));
 $("edText").addEventListener("input",edPreview);
 $("edIcons").addEventListener("click",e=>{const b=e.target.closest("[data-ic]");if(b){edIcon=b.getAttribute("data-ic");renderIcons();$("edIcons").querySelector('[aria-pressed="true"]').focus()}});
 $("edSave").addEventListener("click",edSave);
 $("edDel").addEventListener("click",edDelete);
 $("edHear").addEventListener("click",()=>{const x=$("edText").value.trim();if(x)speakVi(x)});
 $("garageGrid").addEventListener("click",e=>{const b=e.target.closest("[data-car]");if(b&&!b.disabled){store.set("car",+b.getAttribute("data-car"));renderGarage();toast("Đã đổi xe 🚗")}});
-$("settings").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;S[b.getAttribute("data-k")]=JSON.parse(b.getAttribute("data-v"));saveS();renderSettings();const f=$("settings").querySelector(`[data-k="${b.getAttribute("data-k")}"][aria-pressed="true"]`);if(f)f.focus()});
+$("settings").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;S[b.getAttribute("data-k")]=JSON.parse(b.getAttribute("data-v"));saveS();renderSettings();musicSync();const f=$("settings").querySelector(`[data-k="${b.getAttribute("data-k")}"][aria-pressed="true"]`);if(f)f.focus()});
 $("voices").addEventListener("click",e=>{const b=e.target.closest("[data-voice]");if(!b)return;
   let vs=[];try{vs=speechSynthesis.getVoices().filter(v=>/^vi([-_]|$)/i.test(v.lang))}catch(er){}
   const v=vs[+b.getAttribute("data-voice")];if(!v)return;
@@ -64,11 +67,9 @@ $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){$("kidIn").value=S.kidName;renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns&&gateCb){const cb=gateCb;gateCb=null;cb();return}
+  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
 $("weakClear").addEventListener("click",()=>{if(window.confirm("Xoá danh sách từ khó của bé?")){clearWeak();toast("Đã xoá")}});
-function saveKid(){S.kidName=$("kidIn").value.replace(/\s+/g," ").trim().slice(0,20);saveS();renderHome();toast(S.kidName?"Đã lưu tên: "+S.kidName:"Đã xoá tên bé");if(S.kidName&&S.voice)speakVi("Chào "+S.kidName+"!")}
-$("kidSave").addEventListener("click",saveKid);
-$("kidIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveKid()}});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
 /* ---------- điều khiển TV (remote) / bàn phím ----------
@@ -78,7 +79,7 @@ $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 const DIRS={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],Left:[-1,0],Right:[1,0],Up:[0,-1],Down:[0,1]};
 const KEYCODE_DIR={37:"ArrowLeft",38:"ArrowUp",39:"ArrowRight",40:"ArrowDown"};
 function focusables(){
-  const root=$("gate").classList.contains("show")?$("gate"):$("over").classList.contains("show")?$("over"):document;
+  const root=$("gate").classList.contains("show")?$("gate"):document.querySelector(".over.show")||document;
   return Array.prototype.slice.call(root.querySelectorAll("button,summary,textarea,input")).filter(el=>!el.disabled&&!el.hidden&&el.getClientRects().length&&getComputedStyle(el).visibility!=="hidden");
 }
 function moveFocus(dx,dy){
@@ -107,7 +108,9 @@ document.addEventListener("keydown",e=>{
     const n=+e.key-1;
     const L=MODE(curMode).src==="stories"?STORIES:lessons();
     if(screen==="pick"&&L[n]){startGame(L[n].id,curMode);return}
-    if(screen==="home"&&MODES[n]){openPick(MODES[n].id);return}
+    const gs=MODE_GROUPS.filter(g=>g[2]===curSub);
+    if(screen==="home"&&gs[n]){openGroup(gs[n][0]);return}   // trang chủ: số 1–4 mở nhóm trò
+    const ms=grpModes(curGroup);if(screen==="group"&&ms[n]){openPick(ms[n].id);return}
   }
   if(screen==="play")switch(e.keyCode){
     case 403:if(!$("mic").hidden)$("mic").click();break;
@@ -118,5 +121,5 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- khởi động ---------- */
 $("car").innerHTML=CAR_SVG;$("ghost").innerHTML=CAR_SVG+'<span class="gtag">👻</span>';
-$("buddyHome").innerHTML=FACE_SVG;$("buddyPlay").innerHTML=FACE_SVG;
-applyCar();renderHome();
+applyKidLook();applyCar();renderHome();
+try{if(sessionStorage.getItem("ddc_hi")){sessionStorage.removeItem("ddc_hi");toast(`Chào ${KID.name||"bé"}! ${KID.av||""}`)}}catch(e){}   // vừa đổi bé (trang tải lại)

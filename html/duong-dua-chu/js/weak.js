@@ -2,6 +2,7 @@
 let weak=store.get("weak",{});
 const weakScore=e=>e.m-e.s*.5;   // sai 1 lần cần đúng 2 lần mới hết "khó"
 function noteWord(w,ok){
+  if(G.noWeak||(DUO&&DUO.turn===1))return;   // trò Chữ cái, hoặc lượt của bé thứ hai khi chơi đôi
   w=norm(w||"");if(!w||w.indexOf(" ")>=0)return;
   if(ok&&(!weak[w]||!weak[w].m))return;    // chưa từng sai thì không cần ghi lần đúng
   if(ok&&G.missed===w)return;              // đúng ngay sau khi vừa sai (có thể do loại trừ) thì không tính

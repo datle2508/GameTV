@@ -1,4 +1,4 @@
-/* voice.js — Giọng đọc mẫu: speakVi → nguồn bố mẹ chọn prov(): Gemini TTS (mKey, mFetch, mLoadModels) | Google Cloud TTS (gKey, gFetch, gLoadVoices) — chung aiAudio (cache bộ nhớ + IndexedDB), aiSpeak, aiPrefetch, aiFail, renderAI → dự phòng: giọng Claude → webSpeak (speechSynthesis, pickVoice, voiceNote). Chạy ngay khi nạp: loadVoices(). */
+/* voice.js — Giọng đọc mẫu: speakVi → giọng thu sẵn (pack.js) nếu có → nguồn bố mẹ chọn prov(): Gemini TTS (mKey, mFetch, mLoadModels) | Google Cloud TTS (gKey, gFetch, gLoadVoices) — chung aiAudio (cache bộ nhớ + IndexedDB), aiSpeak, aiPrefetch, aiFail, renderAI → dự phòng: giọng Claude → webSpeak (speechSynthesis, pickVoice, voiceNote). Chạy ngay khi nạp: loadVoices(). */
 /* Nguồn giọng: S.ttsProv = "gemini" | "google" | "device". Chưa chọn thì tự dùng nguồn đã có key.
    Nguồn AI lỗi key, hoặc đang tạm hết lượt miễn phí → dùng giọng của máy cho tới khi sửa xong. */
 const VOICE_TEST="cá, cà, cả, cã, cạ. Mẹ đưa bé đi chợ.";
@@ -9,16 +9,25 @@ function prov(){
   if(want==="google"&&gKey&&!aiBad.google)return "google";
   return "device";
 }
+/* w: chữ, hoặc mảng đoạn ghép (Toán) — giọng thu sẵn ghép từng đoạn, các nguồn khác đọc cả câu.
+   Trả về Promise xong khi đọc xong (hoặc bị câu mới thay, hoặc quá 12 giây) — trò Toán đợi đọc xong đáp án rồi mới sang câu sau. */
 function speakVi(w){
-  if(!w)return;
-  const go=()=>{
-    const p=prov();
-    if(p!=="device"){try{speechSynthesis.cancel()}catch(e){}aiSpeak(p,w).catch(e=>{aiFail(p,e);fallbackSpeak(w)});return}
-    fallbackSpeak(w);
-  };
-  stopListen(go);
+  if(!w||(w.length===0))return Promise.resolve();
+  const parts=w;if(Array.isArray(w))w=w.join(" ");
+  return new Promise(done=>{
+    const safety=setTimeout(done,12000),end=()=>{clearTimeout(safety);done()};
+    const go=()=>{
+      /* giọng thu sẵn (pack.js): tắt giọng máy đang đọc dở kẻo chồng tiếng; câu đã cũ (có câu mới hơn) thì không đọc dự phòng */
+      if(packParts(parts)){try{speechSynthesis.cancel()}catch(e){}if(tts&&tts.stop)try{tts.stop()}catch(e){}
+        packSpeak(parts).then(end,e=>{if(e&&e.stale)return end();const p=prov();if(p!=="device")aiSpeak(p,w).then(end,er=>{aiFail(p,er);fallbackSpeak(w,end)});else fallbackSpeak(w,end)});return}
+      const p=prov();
+      if(p!=="device"){try{speechSynthesis.cancel()}catch(e){}aiSpeak(p,w).then(end,e=>{aiFail(p,e);fallbackSpeak(w,end)});return}
+      fallbackSpeak(w,end);
+    };
+    stopListen(go);
+  });
 }
-function fallbackSpeak(w){if(tts)tts.speak(w,{language:"vi",rate:.8}).catch(()=>webSpeak(w));else webSpeak(w)}
+function fallbackSpeak(w,cb){cb=cb||function(){};if(tts)tts.speak(w,{language:"vi",rate:.8}).then(cb,()=>webSpeak(w,0,cb));else webSpeak(w,0,cb)}
 
 /* ---------- phần chung cho giọng AI: cache + phát qua AudioContext ----------
    Key chỉ lưu trong localStorage của máy này. Mỗi đoạn chữ chỉ gọi dịch vụ MỘT lần rồi lưu lại (bộ nhớ + IndexedDB).
@@ -60,7 +69,7 @@ function pcmBuf(rate,b64){
   buf._peak=peak;buf._full=n/rate;
   return buf;
 }
-function stopAudio(){gSeq++;if(gCur){try{gCur.stop()}catch(e){}gCur=null}}
+function stopAudio(){gSeq++;if(gCur){try{gCur.stop()}catch(e){}gCur=null}if(packEl){try{packEl.pause()}catch(e){}packEl=null}}
 /* Không bao giờ để bé chờ trong im lặng: giọng AI chưa có sau AI_WAIT ms → đọc ngay bằng giọng của máy,
    giọng AI vẫn tải tiếp và được lưu cho lần sau. */
 const AI_WAIT=3500;
@@ -263,15 +272,15 @@ function voiceNote(){
   el.textContent=tts?"🗣 Giọng đọc: giọng Claude (tiếng Việt)":viVoice?`🗣 Giọng đọc: ${viVoice.name} (${viVoice.lang})`:"⚠️ Máy chưa có giọng đọc tiếng Việt — xem hướng dẫn bên dưới.";
 }
 try{loadVoices();if(speechSynthesis.addEventListener)speechSynthesis.addEventListener("voiceschanged",loadVoices);else speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
-function webSpeak(w,tries){
-  tries=tries||0;if(!tries)stopAudio();
+function webSpeak(w,tries,cb){
+  tries=tries||0;if(!tries)stopAudio();cb=cb||function(){};
   try{
     if(!viVoice)loadVoices();
-    if(!viVoice&&tries<6){setTimeout(()=>webSpeak(w,tries+1),200);return}   // danh sách giọng chưa nạp xong: đợi tối đa ~1,2 giây
+    if(!viVoice&&tries<6){setTimeout(()=>webSpeak(w,tries+1,cb),200);return}   // danh sách giọng chưa nạp xong: đợi tối đa ~1,2 giây
     if(!viVoice&&screen==="play")say("Máy chưa có giọng tiếng Việt, bố mẹ đọc giúp bé nhé.");
     const u=new SpeechSynthesisUtterance(w);u.lang="vi-VN";u.rate=.8;if(viVoice)u.voice=viVoice;
-    lastUtter=u;   // giữ tham chiếu, kẻo Safari/Chrome thu hồi giữa chừng
+    u.onend=u.onerror=()=>cb();lastUtter=u;   // giữ tham chiếu, kẻo Safari/Chrome thu hồi giữa chừng
     if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),80)}   // Safari hay nuốt câu nói ngay sau cancel()
     else speechSynthesis.speak(u);
-  }catch(e){if(screen==="play")say("Máy này chưa đọc được, bố mẹ đọc giúp bé nhé.")}
+  }catch(e){cb();if(screen==="play")say("Máy này chưa đọc được, bố mẹ đọc giúp bé nhé.")}
 }

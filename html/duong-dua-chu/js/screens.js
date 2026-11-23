@@ -1,4 +1,4 @@
-/* screens.js — Màn hình: screen/curMode, show, back, renderHome, openPick, renderPick; Soạn bài: openEditor, renderIcons, edPreview, edSave, edDelete; Gara: applyCar, renderGarage; Bố mẹ: SETS, renderSettings, renderVoices, VOICE_TEST, openGate. */
+/* screens.js — Màn hình: screen/curMode, show, back, trang chủ renderHome (tab môn curSub/setSub, ô nhóm trò), openGroup (màn nhóm trò), openPick, renderPick; Soạn bài: openEditor, renderIcons, edPreview, edSave, edDelete; Gara: applyCar (xe theo bé + applyDeco), renderGarage (+renderDecos); Bố mẹ: SETS, renderSettings, renderVoices, openGate(cb). */
 /* =====================================================================
    ĐIỀU HƯỚNG MÀN HÌNH
    ===================================================================== */
@@ -11,34 +11,52 @@ function show(id){
   $("homeBtn").style.visibility=id==="home"?"hidden":"visible";
   window.scrollTo(0,0);
   if(id==="home")renderHome();
+  musicSync();
 }
 function back(){
   if($("gate").classList.contains("show")){$("gate").classList.remove("show");return}
-  if($("over").classList.contains("show")){openPick(G.mode,true);return}
-  if(screen==="play")openPick(G.mode,true);
-  else if(screen==="editor")openPick(curMode,true);
+  if($("limitOv").classList.contains("show")){$("limitOv").classList.remove("show");show("home");return}
+  if(screen==="kids"&&kf){kf=null;renderKids();return}
+  if($("over").classList.contains("show")||screen==="play"){openPick(G.mode,true);return}
+  if(screen==="editor")openPick(curMode,true);
+  else if(screen==="pick")openGroup(MODE(curMode).grp);
   else if(screen!=="home")show("home");
 }
 function updateTotals(){$("totalStars").textContent=totalStars()}
 
+/* trang chủ: tab môn (curSub) → nút Học tiếp (lộ trình môn đó) → nhiệm vụ → các ô nhóm trò → hàng nút nhỏ */
+let curSub=store.get("sub","vi");
+const maxStars=m=>(m.src==="none"?1:m.src==="stories"?STORIES.length:lessons().length)*3;   // số sao tối đa của mỗi trò
+const grpModes=g=>MODES.filter(m=>m.grp===g);
 function renderHome(){
-  updateTotals();
-  const den=m=>(m.src==="none"?1:m.src==="stories"?STORIES.length:lessons().length)*3;   // số sao tối đa của mỗi trò
-  renderMission();
-  $("heroMsg").textContent=`Chào ${kid()}! Hôm nay mình chơi trò gì nào?`;
-  const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${den(m)}</span></button>`;
-  $("modes").innerHTML=MODE_GROUPS.map(g=>`<h3 class="grpT">${g[1]}</h3>`+MODES.map((m,i)=>m.grp===g[0]?card(m,i):"").join("")).join("");
+  updateTotals();renderMission();
+  $("heroMsg").textContent=DUO?`Chào ${DUO.a.name||"bé"} và ${DUO.b.name||"bạn"}! Hai bạn chơi trò gì nào?`:`Chào ${kid()}! Hôm nay mình chơi trò gì nào?`;
+  $("subTabs").innerHTML=SUBJECTS.map(x=>`<button class="subTab" data-sub="${x[0]}" role="tab" aria-pressed="${x[0]===curSub}">${x[1]}</button>`).join("");
+  $("pathBtn").innerHTML=pathBtnHtml();
+  $("duoBar").hidden=!DUO;if(DUO)$("duoTxt").textContent=`👫 ${DUO.a.av} ${DUO.a.name||"Bé"} và ${DUO.b.av} ${DUO.b.name||"bạn"} đang chơi đôi: chọn một trò, mỗi bạn chơi một lượt!`;
+  $("groups").innerHTML=MODE_GROUPS.filter(g=>g[2]===curSub).map((g,i)=>{const ms=grpModes(g[0]),st=ms.reduce((a,m)=>a+modeStars(m.id),0),mx=ms.reduce((a,m)=>a+maxStars(m),0);
+    const ic=g[1].split(" ")[0],nm=g[1].slice(ic.length+1);
+    return `<button class="grpTile" data-g="${g[0]}" style="--mc:${g[3]}"><span class="num">${i+1}</span><span class="gi">${ic}</span><b>${nm}</b><small>${ms.map(m=>m.icon).join(" ")}</small><span class="mstars">⭐ ${st}/${mx}</span></button>`}).join("");
+  $("newBtn").hidden=curSub!=="vi";
+}
+function setSub(x){curSub=x;store.set("sub",x);renderHome();const b=$("subTabs").querySelector('[aria-pressed="true"]');if(b)b.focus()}
+let curGroup="chu";
+function openGroup(g){
+  curGroup=g;const G0=MODE_GROUPS.find(x=>x[0]===g)||MODE_GROUPS[0];
+  $("grpTitle").textContent=G0[1];$("grpTitle").style.color=G0[3];$("grpSub").textContent=`${grpModes(g).length} trò · chạm một trò để chơi`;
+  $("modes").innerHTML=grpModes(g).map((m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${maxStars(m)}</span></button>`).join("");
+  show("group");
 }
 function openPick(m,silent){
   curMode=m;const M=MODE(m);
-  if(M.src==="none"){if(silent)show("home");else startGame("bank",m);return}   // trò không cần chọn bài
+  if(M.src==="none"){if(silent)openGroup(M.grp);else startGame("bank",m);return}   // trò không cần chọn bài
   $("pickIcon").textContent=M.icon;$("pickTitle").textContent=M.name;$("pickTitle").style.color=M.col;$("pickDesc").textContent=M.desc;
   renderPick();show("pick");
-  if(!silent&&S.voice)speakVi(M.say+" Bé chọn một bài nhé.");
+  if(!silent&&S.voice)speakVi(M.say+" "+Kid()+" chọn một bài nhé.");
 }
 function renderPick(){
   if(MODE(curMode).src==="stories"){   // Truyện tranh: chọn truyện
-    $("lessonGrid").innerHTML=STORIES.map((t,i)=>`<div class="lcWrap"><button class="lessonCard" data-l="${t.id}" ${i===0?"data-primary":""}><span class="num">${i+1}</span><span class="li">${t.icon}</span><b>${esc(t.t)}</b><small>${t.pages.length} trang</small>${starRow(prog[t.id+"|story"]||0)}</button></div>`).join("");
+    $("lessonGrid").innerHTML=STORIES.map((t,i)=>`<div class="lcWrap"><button class="lessonCard" data-l="${t.id}" ${i===0?"data-primary":""}><span class="num">${i+1}</span><span class="li">${t.icon}</span><b>${esc(t.t)}</b><small>${t.pages.length} trang · ${t.lv>1?"⭐⭐ Vừa":"⭐ Dễ"}</small>${starRow(prog[t.id+"|story"]||0)}</button></div>`).join("");
     return;
   }
   const wl=!MODE(curMode).noWeak&&weakLesson(),ws=wl?prog["weak|"+curMode]||0:0;
@@ -90,19 +108,24 @@ function edDelete(){
 /* =====================================================================
    GARA & BỐ MẸ
    ===================================================================== */
-function applyCar(){let i=+store.get("car",0)||0;if(!CARS[i]||totalStars()<CARS[i].need)i=0;$("car").style.setProperty("--carc",CARS[i].c);return i}
+/* xe mặc định theo bé: bé trai xe xanh, bé gái xe hồng */
+function applyCar(){let i=store.get("car",null);if(i==null)i=KID.g==="girl"?5:KID.g==="boy"?1:0;i=+i||0;if(!CARS[i]||totalStars()<CARS[i].need)i=0;$("car").style.setProperty("--carc",CARS[i].c);applyDeco();return i}
 function renderGarage(){
   const tot=totalStars(),sel=applyCar();
   $("garageGrid").innerHTML=CARS.map((c,i)=>{const locked=tot<c.need;
     return `<button class="gslot${locked?" locked":""}" data-car="${i}" aria-pressed="${i===sel}" ${locked?"disabled":""} ${i===sel?"data-primary":""} aria-label="${locked?"Xe bị khoá, cần "+c.need+" sao":"Xe số "+(i+1)}"><span class="gcar" style="color:${c.c}">${CAR_SVG}</span><span class="tag">${locked?"🔒 cần ⭐"+c.need:i===sel?"✅ Đang lái":"Chọn xe này"}</span></button>`}).join("");
   const nx=CARS.find(c=>c.need>tot);
-  $("garageNext").textContent=nx?`Bé có ${tot} ⭐. Còn ${nx.need-tot} ⭐ nữa là mở khoá xe mới!`:"Bé đã mở khoá tất cả xe! 🏆";
+  renderDecos();
+  $("garageNext").textContent=nx?`${KID.name||"Bé"} có ${tot} ⭐. Còn ${nx.need-tot} ⭐ nữa là mở khoá xe mới!`:"Bé đã mở khoá tất cả xe! 🏆";
 }
 const SETS=[
  {k:"quickSec",t:"⏱ Thời gian mỗi từ (trò Đọc nhanh)",o:[[4,"4 giây"],[6,"6 giây"],[8,"8 giây"],[10,"10 giây"]]},
  {k:"strict",t:"🎯 Chấm dấu thanh khi đọc",o:[[false,"Dễ — bỏ qua lỗi dấu"],[true,"Chặt — phải đúng dấu"]]},
  {k:"sfx",t:"🔔 Âm thanh vui",o:[[true,"Bật"],[false,"Tắt"]]},
- {k:"voice",t:"🗣 Máy tự đọc hướng dẫn",o:[[true,"Bật"],[false,"Tắt"]]}
+ {k:"voice",t:"🗣 Máy tự đọc hướng dẫn",o:[[true,"Bật"],[false,"Tắt"]]},
+ {k:"pack",t:"🎧 Giọng thu sẵn cho bài mẫu, hướng dẫn, truyện (chuẩn dấu, không cần key)",o:[[true,"Bật"],[false,"Tắt"]]},
+ {k:"music",t:"🎵 Nhạc nền nhẹ (ngoài màn chơi)",o:[[false,"Tắt"],[true,"Bật"]]},
+ {k:"limit",t:"⏰ Giới hạn giờ chơi mỗi ngày (mỗi bé)",o:[[0,"Không giới hạn"],[15,"15 phút"],[20,"20 phút"],[30,"30 phút"],[45,"45 phút"]]}
 ];
 function renderSettings(){
   $("settings").innerHTML=SETS.map(g=>`<div class="setGroup"><h3>${g.t}</h3><div class="seg">${g.o.map(o=>`<button data-k="${g.k}" data-v='${JSON.stringify(o[0])}' aria-pressed="${S[g.k]===o[0]}">${o[1]}</button>`).join("")}</div></div>`).join("");
@@ -115,8 +138,9 @@ function renderVoices(){
     vs.length?`<div class="seg">${vs.map((v,i)=>`<button data-voice="${i}" aria-pressed="${v.name===cur}">${esc(v.name)}${/natural|neural|online|premium|enhanced/i.test(v.name)?" ⭐":""}</button>`).join("")}</div>`:
     '<p class="warn">Máy này chưa có giọng đọc tiếng Việt.</p>';
 }
-let gateAns=0;
-function openGate(){
+/* cổng bố mẹ: cb = việc cần làm khi trả lời đúng (mặc định mở Góc bố mẹ) */
+let gateAns=0,gateCb=null;
+function openGate(cb){gateCb=typeof cb==="function"?cb:null;
   const a=3+Math.floor(Math.random()*7),b=12+Math.floor(Math.random()*8);gateAns=a*b;
   $("gateQ").textContent=`${a} × ${b} = ?`;
   $("gateOpts").innerHTML=shuffle([gateAns,gateAns+a,gateAns-a,gateAns+10]).map(v=>`<button class="btn ghost" data-g="${v}">${v}</button>`).join("");
