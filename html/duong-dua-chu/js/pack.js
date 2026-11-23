@@ -109,5 +109,14 @@ function packPhrases(){
     one(numVi(a)+" và "+numVi(b));one(numVi(a)+" "+(a>b?"lớn hơn":a<b?"bé hơn":"bằng")+" "+numVi(b));
   }
   WORDPROBS.forEach(p=>add(p[2]));
+  /* math2.js: tách gộp số (≤ 20), đồng hồ, quy luật, đi chợ, cờ đường số */
+  for(let n=2;n<=20;n++)for(let a=1;a<n;a++){one(`${numVi(n)} gồm ${numVi(a)} và mấy?`);one(`${numVi(n)} gồm ${numVi(a)} và ${numVi(n-a)}.`)}
+  one("Đồng hồ chỉ mấy giờ?");
+  for(let h=1;h<=12;h++)[0,15,30,45].forEach(m=>{one(timeText(h,m,1)+".");one(`Đâu là đồng hồ chỉ ${timeText(h,m,1)}?`)});
+  ["Cái gì tiếp theo?","Số nào tiếp theo?","nghìn.","Bé trả tiền nào cho vừa đủ?","Vừa đủ rồi!","Bé đưa","Được thối lại mấy nghìn?","Thối lại",
+   "Tên lửa! Bay lên 3 ô.","Ốc sên! Lùi 2 ô.","Ô ngôi sao!","Lượt của Rô-bốt.","Rô-bốt về đích trước!","Bé về đích trước!","Lượt của Bé.","Lượt của Bạn khách.","Bạn khách về đích trước!"].forEach(one);
+  for(let d=1;d<=6;d++)one(`Được ${numVi(d)} bước.`);
+  SHOP_ITEMS.forEach(x=>{one(x[1]+" giá");one("Mua "+x[1]+" hết")});
+  (NAMES_B.concat(NAMES_G,extra?decodeURIComponent(extra).split(",").filter(Boolean):[])).forEach(n=>{one(`Lượt của ${n}.`);one(`${n} về đích trước!`)});
   return out;
 }

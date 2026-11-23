@@ -94,3 +94,4 @@
 .repText{width:100%;min-height:170px;margin-top:10px;font-size:16px}
 @media(max-width:600px){.top{gap:7px}.ib,.pill{height:48px}.ib{width:46px;font-size:24px}.pill{padding:0 10px;font-size:22px}.logo{font-size:24px}.kidPill b{display:none}.kidPill{padding:0 8px}.mission{gap:6px 10px}.pathBtn{font-size:21px}.pstop{width:96%}}
 @media(max-width:600px){.grpGrid{grid-template-columns:1fr 1fr;gap:12px}.grpTile{min-height:150px;padding:12px 8px}.grpTile .gi{font-size:44px}.grpTile b{font-size:20px}.grpTile small{font-size:16px;letter-spacing:0}.mission .mpet{display:none}.subTab{min-height:54px}.mini{min-width:76px}}
+@media(max-width:600px){.cell{min-height:48px;font-size:18px}.tok{font-size:18px}.board{gap:3px}}

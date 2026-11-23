@@ -18,7 +18,8 @@ function numVi(n){
 function numChoices(ans,lo,hi,k){
   const c=[ans+1,ans-1,ans+2,ans-2,ans+10,ans-10];if(ans>=10&&ans%11)c.push(+String(ans).split("").reverse().join(""));
   const out=[ans];shuffle(c).forEach(v=>{if(out.length<k&&v>=lo&&v<=hi&&out.indexOf(v)<0)out.push(v)});
-  while(out.length<k){const v=ri(lo,hi);if(out.indexOf(v)<0)out.push(v)}
+  k=Math.min(k,hi-lo+1);   // khoảng số hẹp (vd "2 gồm 1 và mấy?" chỉ có 0–2) thì bớt lựa chọn, kẻo lặp mãi
+  for(let t=0;out.length<k&&t<500;t++){const v=ri(lo,hi);if(out.indexOf(v)<0)out.push(v)}
   return shuffle(out);
 }
 /* hàng đồ vật để đếm (tối đa 20, xếp 5 cái một nhóm); x = số cái cuối bị gạch (phép trừ) */

@@ -34,20 +34,25 @@ const MODES=[
  {id:"quick",icon:"⚡",name:"Đọc nhanh",desc:"Đọc từ trước khi hết giờ",say:"Từ hiện ra, bé đọc thật nhanh trước khi hết giờ nhé!",col:"#f08a00",grp:"doc"},
  {id:"rain",icon:"🌧️",name:"Mưa chữ",desc:"Nghe rồi hứng đúng chữ đang rơi",say:"Chữ đang rơi xuống. Bé nghe rồi bấm vào cái giỏ dưới chữ đúng nhé.",col:"#1c7ed6",grp:"vui"},
  {id:"memory",icon:"🃏",name:"Lật thẻ",desc:"Tìm cặp chữ và hình đi với nhau",say:"Bé lật hai thẻ một lần, tìm chữ đi với hình đúng nhé.",col:"#862e9c",grp:"vui"},
- /* ---- Toán (math.js): không chọn bài, độ khó theo cấp độ của bé ---- */
+ /* ---- Toán (math.js, math2.js): không chọn bài, độ khó theo cấp độ của bé ---- */
  {id:"count",icon:"🍎",name:"Đếm hình",desc:"Đếm rồi chọn số đúng",say:"Bé đếm hình rồi chọn số đúng nhé.",col:"#0ca678",grp:"so",sub:"math",src:"none",selfSay:1},
  {id:"numrec",icon:"🔢",name:"Tìm số",desc:"Nghe số rồi chọn chữ số",say:"Bé nghe máy đọc số, rồi tìm số đúng nhé.",col:"#2b8a3e",grp:"so",sub:"math",src:"none",selfSay:1},
  {id:"add",icon:"➕",name:"Phép cộng",desc:"Cộng hai số",say:"Bé làm phép cộng nhé.",col:"#e8457f",grp:"tinh",sub:"math",src:"none",selfSay:1},
  {id:"sub",icon:"➖",name:"Phép trừ",desc:"Trừ hai số",say:"Bé làm phép trừ nhé. Hình bị gạch là đã bớt đi.",col:"#c2255c",grp:"tinh",sub:"math",src:"none",selfSay:1},
- {id:"mathrace",icon:"⏱️",name:"Tính nhẩm nhanh",desc:"Tính trước khi hết giờ",say:"Tính thật nhanh trước khi hết giờ nhé!",col:"#f03e3e",grp:"tinh",sub:"math",src:"none"},
+ {id:"mathrace",icon:"⏱️",name:"Tính nhẩm nhanh",desc:"Tính trước khi hết giờ",say:"Tính thật nhanh trước khi hết giờ nhé!",col:"#f03e3e",grp:"vuiso",sub:"math",src:"none"},
+ {id:"board",icon:"🎲",name:"Cờ đường số",desc:"Gieo xúc xắc, đua về đích",say:"Mình chơi cờ đường số nhé. Bấm gieo xúc xắc rồi đếm bước đi.",col:"#7048e8",grp:"vuiso",sub:"math",src:"none",duoSelf:1},
+ {id:"bond",icon:"🍬",name:"Tách gộp số",desc:"Số này gồm mấy và mấy",say:"Bé tách số thành hai phần nhé.",col:"#20c997",grp:"so",sub:"math",src:"none",selfSay:1},
  {id:"compare",icon:"⚖️",name:"So sánh",desc:"Chọn dấu lớn, bé, bằng",say:"Bé so sánh hai số, rồi chọn dấu lớn hơn, bé hơn hoặc bằng nhé.",col:"#1c7ed6",grp:"sosanh",sub:"math",src:"none",selfSay:1},
  {id:"seq",icon:"➡️",name:"Số còn thiếu",desc:"Điền số vào dãy số",say:"Bé tìm số còn thiếu trong dãy số nhé.",col:"#1098ad",grp:"sosanh",sub:"math",src:"none",selfSay:1},
+ {id:"pattern",icon:"🎨",name:"Quy luật",desc:"Tìm cái tiếp theo",say:"Bé tìm quy luật, rồi chọn cái tiếp theo nhé.",col:"#4263eb",grp:"sosanh",sub:"math",src:"none",selfSay:1},
  {id:"shape",icon:"🔷",name:"Hình học",desc:"Nhận biết các hình",say:"Bé nhìn hình rồi chọn cho đúng nhé.",col:"#f08a00",grp:"hinh",sub:"math",src:"none",selfSay:1},
+ {id:"clock",icon:"🕒",name:"Xem đồng hồ",desc:"Đồng hồ chỉ mấy giờ",say:"Bé xem đồng hồ nhé. Kim ngắn chỉ giờ, kim dài chỉ phút.",col:"#e67700",grp:"hinh",sub:"math",src:"none",selfSay:1},
+ {id:"shop",icon:"🛒",name:"Đi chợ",desc:"Trả tiền cho vừa đủ",say:"Mình cùng đi chợ nhé. Bé chọn tiền trả cho vừa đủ.",col:"#2b8a3e",grp:"hinh",sub:"math",src:"none",selfSay:1},
  {id:"word",icon:"📝",name:"Toán đố",desc:"Đọc bài toán, chọn đáp số",say:"Bé đọc bài toán rồi chọn đáp số đúng nhé.",col:"#d9480f",grp:"hinh",sub:"math",src:"none",selfSay:1},
 ];
 /* nhóm trò: [id, tên, môn ("vi" Tiếng Việt | "math" Toán), màu ô trên trang chủ] */
 const MODE_GROUPS=[["chu","🔤 Học chữ","vi","#12a36f"],["hieu","💡 Hiểu nghĩa","vi","#e67700"],["doc","🎤 Đọc to","vi","#2d8cff"],["vui","🎮 Vui nhộn","vi","#862e9c"],
- ["so","🔢 Số và đếm","math","#0ca678"],["tinh","🧮 Cộng trừ","math","#e8457f"],["sosanh","⚖️ So sánh, dãy số","math","#1c7ed6"],["hinh","🔷 Hình, toán đố","math","#f08a00"]];
+ ["so","🔢 Số và đếm","math","#0ca678"],["tinh","🧮 Cộng trừ","math","#e8457f"],["sosanh","⚖️ So sánh, quy luật","math","#1c7ed6"],["hinh","🔷 Hình, giờ, tiền","math","#f08a00"],["vuiso","🎲 Vui cùng số","math","#7048e8"]];
 const SUBJECTS=[["vi","📖 Tiếng Việt"],["math","🔢 Toán"]];
 /* Đúng hay sai: câu ngắn vốn từ lớp 1, kèm hình gợi ý. ok: 1 = đúng, 0 = sai */
 const STATEMENTS=[
@@ -131,9 +136,9 @@ const FACE_GIRL=FACE_SVG.replace("#ff4d4d","#ff5fa2")+'<g fill="#ff5fa2"><path d
 /* ===== Toán (math.js) ===== */
 /* lộ trình Toán theo cấp độ */
 const PATHS_MATH={
- mam:[["count","bank"],["numrec","bank"],["add","bank"],["compare","bank"],["shape","bank"],["seq","bank"],["sub","bank"],["word","bank"],["mathrace","bank"]],
- l1:[["numrec","bank"],["count","bank"],["add","bank"],["sub","bank"],["compare","bank"],["seq","bank"],["shape","bank"],["mathrace","bank"],["word","bank"]],
- l2:[["numrec","bank"],["compare","bank"],["seq","bank"],["add","bank"],["sub","bank"],["mathrace","bank"],["shape","bank"],["word","bank"],["count","bank"]]
+ mam:[["count","bank"],["numrec","bank"],["pattern","bank"],["bond","bank"],["add","bank"],["compare","bank"],["shape","bank"],["board","bank"],["clock","bank"],["seq","bank"],["sub","bank"],["shop","bank"],["word","bank"],["mathrace","bank"]],
+ l1:[["numrec","bank"],["count","bank"],["bond","bank"],["add","bank"],["sub","bank"],["pattern","bank"],["compare","bank"],["board","bank"],["seq","bank"],["clock","bank"],["shape","bank"],["shop","bank"],["mathrace","bank"],["word","bank"]],
+ l2:[["numrec","bank"],["compare","bank"],["seq","bank"],["bond","bank"],["add","bank"],["sub","bank"],["pattern","bank"],["clock","bank"],["mathrace","bank"],["shop","bank"],["board","bank"],["shape","bank"],["word","bank"],["count","bank"]]
 };
 /* đồ vật để đếm: [hình, tên kèm loại từ] */
 const COUNTABLES=[["🍎","quả táo"],["🐟","con cá"],["⭐","ngôi sao"],["🎈","quả bóng bay"],["🐥","con gà con"],["🚗","chiếc xe"],["🌸","bông hoa"],["🍌","quả chuối"]];
@@ -166,3 +171,6 @@ const WORDPROBS=[
  ["l2","💵","Bé có 90 nghìn đồng. Bé mua sách hết 40 nghìn đồng. Hỏi bé còn bao nhiêu nghìn đồng?",50],
  ["l2","🌳","Trường có 27 cây phượng và 30 cây bàng. Hỏi trường có tất cả bao nhiêu cây?",57]
 ];
+/* Đi chợ: [hình, tên]; mệnh giá tiền theo cấp (nghìn đồng) */
+const SHOP_ITEMS=[["🍎","quả táo"],["🍌","nải chuối"],["🍦","que kem"],["🍬","gói kẹo"],["✏️","cái bút chì"],["📒","quyển vở"],["🎈","quả bóng bay"],["🥛","hộp sữa"],["🍞","ổ bánh mì"]];
+const NOTES={mam:[1,2,5],l1:[1,2,5,10],l2:[5,10,20,50]};

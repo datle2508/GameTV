@@ -75,7 +75,11 @@ $("decoGrid").addEventListener("click",e=>{const b=e.target.closest("[data-deco]
 function flowFinish(stars,ms){
   const out=[],A=$("again"),N=$("next"),H=$("toHome");
   A.hidden=false;N.hidden=false;A.textContent="🔁 Chơi lại";N.textContent="Bài tiếp ➡️";H.textContent="🏠 Trò khác";
-  if(DUO){
+  /* Cờ đường số: người về đích trước; chơi đôi trên cùng bàn cờ thì ghi sao cho cả hai bé */
+  if(G.mode==="board"&&G.winner){const w=G.winner;$("rtitle").textContent=`${w.n} về đích trước!`;
+    if(w.robot)out.push("🤖 Rô-bốt nhanh chân hơn. Chơi lại để thắng nhé!");
+    if(DUO){creditKid(DUO.b,G.lesson.id+"|"+G.mode,stars);rw.duo=(rw.duo||0)+1;store.set("rw",rw)}}
+  if(DUO&&!MODE(G.mode).duoSelf){
     const P=[DUO.a,DUO.b],nm=k=>esc(P[k].name||"Bạn");
     if(DUO.turn===0){
       DUO.res=[{stars,ms}];A.hidden=true;N.textContent=`▶️ Lượt của ${P[1].name||"bạn"}`;

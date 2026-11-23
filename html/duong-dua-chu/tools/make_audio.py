@@ -27,6 +27,8 @@ def key():
         k = f.read_text().strip()
     if not k:
         sys.exit("Chưa có key: đặt GOOGLE_TTS_KEY hoặc lưu key vào ~/.config/gametv/google_tts_key")
+    if not re.fullmatch(r"AIza[0-9A-Za-z_-]{30,}", k):
+        sys.exit("Key không đúng dạng (phải bắt đầu bằng AIza…). Lưu lại key Google Cloud vào ~/.config/gametv/google_tts_key")
     return k
 
 def call(path, body=None):
@@ -50,6 +52,9 @@ def synth(text, voice, rate):
         except RuntimeError as e:
             if "speakingRate" in str(e) or "rate" in str(e).lower() and "400" in str(e):
                 cfg.pop("speakingRate", None); continue      # vài giọng không nhận tốc độ
+            if re.search(r"API key|API_KEY|PERMISSION_DENIED|UNAUTHENTICATED", str(e)):
+                print("Key Google không dùng được (hết hạn, bị xoá hoặc sai). Lưu key mới:  pbpaste > ~/.config/gametv/google_tts_key")
+                os._exit(2)   # dừng hẳn, không ghi packdata.js
             if "429" in str(e) or "500" in str(e) or "503" in str(e):
                 time.sleep(2 * (attempt + 1)); continue
             raise
@@ -120,15 +125,22 @@ def main():
         if not (AUDIO / f"{fid}.mp3").exists():
             todo.append((t, fid))
     print(f"{len(ps)} câu, cần tạo {len(todo)} ({sum(len(t) for t, _ in todo)} ký tự) bằng {voice}")
+    failed = []
     def work(item):
         t, fid = item
-        (AUDIO / f"{fid}.mp3").write_bytes(synth(t, voice, rate))
+        try:
+            (AUDIO / f"{fid}.mp3").write_bytes(synth(t, voice, rate))
+        except Exception as e:   # câu lỗi: bỏ khỏi PACK (game sẽ đọc bằng giọng dự phòng), báo ra để sửa
+            failed.append((t, str(e)[:160]))
     done = 0
     with ThreadPoolExecutor(4) as ex:
         for _ in ex.map(work, todo):
             done += 1
             if done % 50 == 0:
                 print(f"  {done}/{len(todo)}")
+    for t, e in failed:
+        print("  LỖI:", repr(t), e)
+        pack.pop(pack_key(t), None)
     keep = set(pack.values())
     for f in AUDIO.glob("*.mp3"):
         if f.stem not in keep:
