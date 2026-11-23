@@ -23,7 +23,7 @@ IMPL.rain={
     if(G.lock||G.over||!G.rid)return;const w=G.list[G.step];
     if(G.choices[i]===w){
       G.lock=true;btn.classList.add("ok");const d=$("drop"+i);if(d)d.classList.add("caught");
-      ding();carMove();say(rnd(PRAISE),1);noteWord(w,true);this.done(900);
+      ding();carMove();say(praise(),1);noteWord(w,true);this.done(900);
     }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, nghe lại nhé!");speakVi(w);
       const f=$("stageBody").querySelector("[data-c]:not([disabled])");if(f)f.focus()}
   },
@@ -64,7 +64,7 @@ IMPL.memory={
     const a=G.cards[G.open[0]],b=G.cards[G.open[1]];
     if(a.w===b.w&&a.k!==b.k){
       a.done=b.done=true;a.up=b.up=false;G.open=[];G.matched++;
-      ding();carMove();say(rnd(PRAISE),1);speakVi(a.w);noteWord(a.w,true);
+      ding();carMove();say(praise(),1);speakVi(a.w);noteWord(a.w,true);
       setProgress(G.matched/G.n,`${G.matched}/${G.n}`);this.render(i);
       if(G.matched>=G.n)later(()=>finish(),600);
     }else{

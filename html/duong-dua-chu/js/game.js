@@ -94,7 +94,7 @@ function finish(){
   const after=totalStars(),unl=CARS.filter(c=>c.need>before&&c.need<=after);
   setProgress(1,"🏁");carMove();
   $("rstars").innerHTML=[0,1,2].map(i=>`<svg class="${i<stars?"on":""}" style="animation-delay:${(.25+i*.25).toFixed(2)}s" viewBox="0 0 24 24"><path d="${STAR}"/></svg>`).join("");
-  $("rtitle").textContent=["","Hoàn thành!","Giỏi lắm!","Xuất sắc!"][stars];
+  $("rtitle").textContent=["","Hoàn thành","Giỏi lắm","Xuất sắc"][stars]+(S.kidName?", "+S.kidName:"")+"!";
   $("rinfo").innerHTML=(ms>=1000?`⏱ ${fmt(ms)}`:"")+(after>before?`<br>⭐ +${after-before} sao`:"")+(stars<3?"<br>Chơi lại để được 3 sao nhé!":"");
   let extra=rewardFinish(stars,ms);if(IMPL_().ghostFinish)extra=extra.concat(IMPL_().ghostFinish(ms));   // sticker, nhiệm vụ, xe bóng ma
   $("runlock").innerHTML=(unl.length?`<div class="unlock">🎉 Mở khoá xe mới! ${unl.map(c=>`<span class="gcar sm" style="color:${c.c}">${CAR_SVG}</span>`).join("")}</div>`:"")+extra.map(x=>`<div class="unlock">${x}</div>`).join("");

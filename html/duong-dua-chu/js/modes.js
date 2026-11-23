@@ -21,7 +21,7 @@ race:{
   },
   render(anim){const W=G.P.words,i=G.ri;$("stageBody").innerHTML=`<span class="cue">Bé đọc to từ này</span><div class="big${anim?" ok":""}">${i<W.length?esc(W[i].c):"Hoan hô!"}</div>`;renderStrip(i)},
   onRead(){const t=Date.now()-G.t0;while(G.trace.length<G.ri)G.trace.push(t);
-    goodRead();vroom();carMove();say(rnd(PRAISE),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
+    goodRead();vroom();carMove();say(praise(),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
   ok(){bump(1)},
   sample(){const w=G.P.words[G.ri];return w?w.c:""}
 },
@@ -41,7 +41,7 @@ sentence:{
     goodRead();const ss=G.P.sents,n=ss.length,doneS=ss.filter(s=>s.end<=G.ri).length,justDone=doneS>G.doneS;G.doneS=doneS;
     const s=ss[Math.min(doneS,n-1)],part=doneS<n?(G.ri-s.start)/(s.end-s.start):0;
     setProgress((doneS+part)/n,`${doneS}/${n}`);
-    if(justDone){vroom();carMove();say(rnd(PRAISE),1);this.render(doneS-1);if(G.ri>=G.R.length){finish();return}later(()=>this.render(),700)}
+    if(justDone){vroom();carMove();say(praise(),1);this.render(doneS-1);if(G.ri>=G.R.length){finish();return}later(()=>this.render(),700)}
     else{tick();this.render()}
   },
   ok(){const s=G.P.sents[this.cur()];bump(s.end-G.ri)},
@@ -76,7 +76,7 @@ quick:{
     if(G.left<=0)this.miss();
   },
   onRead(){
-    if(G.phase!=="go")return;G.phase="hit";G.R=[];G.hits++;goodRead();ding();carMove();say(rnd(PRAISE),1);
+    if(G.phase!=="go")return;G.phase="hit";G.R=[];G.hits++;goodRead();ding();carMove();say(praise(),1);
     const b=$("stageBody").querySelector(".big");if(b)b.classList.add("ok");
     setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);later(()=>this.next(),700);
   },
@@ -107,7 +107,7 @@ balloon:{
   tap(i,btn){
     if(G.lock||G.over)return;const w=G.list[G.step];startClock();
     if(G.choices[i]===w){
-      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(rnd(PRAISE),1);noteWord(w,true);
+      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(praise(),1);noteWord(w,true);
       setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
       later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},850);
     }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng rồi, nghe lại nhé!");later(()=>speakVi(w),450)}
@@ -153,7 +153,7 @@ fill:{
   onRead(){
     goodRead();
     if(G.ri>=G.R.length){
-      G.phase="done";this.renderSent();G.R=[];vroom();carMove();say(rnd(PRAISE),1);
+      G.phase="done";this.renderSent();G.R=[];vroom();carMove();say(praise(),1);
       const n=G.list.length;setProgress((G.step+1)/n,`${G.step+1}/${n}`);
       later(()=>{G.step++;if(G.step>=n)finish();else{this.show();focusMain()}},1000);
     }else{tick();this.renderSent()}

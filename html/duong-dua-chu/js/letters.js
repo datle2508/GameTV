@@ -2,7 +2,7 @@
 
 /* phần chung: chọn đúng / chọn sai */
 function choiceRight(w,next,delay){
-  G.lock=true;ding();carMove();say(rnd(PRAISE),1);noteWord(w,true);G.hits++;
+  G.lock=true;ding();carMove();say(praise(),1);noteWord(w,true);G.hits++;
   setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
   later(()=>{G.lock=false;G.missed=null;G.step++;if(G.step>=G.list.length)finish();else{next();focusMain()}},delay||1000);
 }
@@ -140,7 +140,7 @@ IMPL.hunt={
     if(G.lock||G.over)return;const t=G.tiles[i],rh=G.list[G.step];if(t.got)return;startClock();
     if(t.ok){
       t.got=1;btn.classList.add("ok");btn.disabled=true;ding();noteWord(t.w,true);G.found++;
-      if(G.found>=G.need){G.lock=true;carMove();say(rnd(PRAISE),1);G.hits++;setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
+      if(G.found>=G.need){G.lock=true;carMove();say(praise(),1);G.hits++;setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
         later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},1100);return}
       say(`Đúng rồi! Còn ${G.need-G.found} tiếng nữa.`);
     }else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say(`“${t.w}” không có vần “${rh}” đâu!`)}

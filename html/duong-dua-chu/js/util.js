@@ -21,8 +21,11 @@ const fold=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d
 function lev(a,b){if(Math.abs(a.length-b.length)>1)return 2;let p=[];for(let j=0;j<=b.length;j++)p[j]=j;for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
 
 /* cài đặt bố mẹ */
-const S=Object.assign({quickSec:6,strict:false,sfx:true,voice:true},store.get("settings",{}));
+const S=Object.assign({kidName:"",quickSec:6,strict:false,sfx:true,voice:true},store.get("settings",{}));
 const saveS=()=>store.set("settings",S);
+/* tên bé (bố mẹ đặt ở Góc bố mẹ): kid() → "Na" hoặc "bé"; praise() → lời khen, thỉnh thoảng gọi tên */
+const kid=()=>S.kidName||"bé";
+const praise=()=>{const p=rnd(PRAISE);return S.kidName&&Math.random()<0.5?p.replace(/!$/,"")+", "+S.kidName+"!":p};
 
 /* khớp mềm: đúng hẳn, hoặc chỉ sai dấu thanh (máy hay nghe nhầm), hoặc lệch 1 chữ cái với từ dài.
    Chế độ "chặt" (bố mẹ bật): phải đúng hẳn cả dấu. */

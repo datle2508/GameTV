@@ -13,7 +13,7 @@ IMPL.truefalse={
   },
   pick(i,btn){
     if(G.lock||G.over)return;const it=G.list[G.step];startClock();G.lock=true;
-    if(G.choices[i]===it.ok){btn.classList.add("ok");ding();carMove();say(rnd(PRAISE),1)}
+    if(G.choices[i]===it.ok){btn.classList.add("ok");ding();carMove();say(praise(),1)}
     else{G.errors++;oops();btn.classList.add("wrong");say(it.ok?"Câu này đúng đấy! Bé đọc lại nhé.":"Câu này sai đấy! Bé đọc lại nhé.");speakVi(it.s)}
     setProgress((G.step+1)/G.list.length,`${G.step+1}/${G.list.length}`);
     later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},G.choices[i]===it.ok?1000:2600);
@@ -53,7 +53,7 @@ IMPL.order={
       if(G.placed<G.target.length){tick();this.render();focusMain();return}
       const s=G.list[G.step];G.lock=true;
       $("stageBody").innerHTML=`<span class="cue">Câu ${G.step+1}/${G.list.length}</span><div class="sent"><span class="done">${esc(s.text)}</span></div>`;
-      ding();carMove();say(rnd(PRAISE),1);speakVi(s.text);
+      ding();carMove();say(praise(),1);speakVi(s.text);
       setProgress((G.step+1)/G.list.length,`${G.step+1}/${G.list.length}`);
       later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},1800);
     }else{G.errors++;oops();btn.classList.remove("wrong");void btn.offsetWidth;btn.classList.add("wrong");say("Chưa đúng, từ nào đứng tiếp theo nhỉ?");later(()=>btn.classList.remove("wrong"),500)}
@@ -82,7 +82,7 @@ IMPL.story={
   },
   onRead(){
     goodRead();this.render();
-    if(G.ri>=G.R.length){ding();carMove();say(rnd(PRAISE),1);G.R=[];later(()=>this.next(),1000)}else tick();
+    if(G.ri>=G.R.length){ding();carMove();say(praise(),1);G.R=[];later(()=>this.next(),1000)}else tick();
   },
   next(){
     if(G.phase!=="read"||G.over)return;G.R=[];G.step++;carMove();
@@ -96,7 +96,7 @@ IMPL.story={
   },
   pick(i,btn){
     if(G.phase!=="q"||G.lock||G.over)return;startClock();
-    if(i===G.st.q[2]){G.lock=true;btn.classList.add("ok");ding();vroom();say(rnd(PRAISE),1);finish()}
+    if(i===G.st.q[2]){G.lock=true;btn.classList.add("ok");ding();vroom();say(praise(),1);finish()}
     else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, bé nhớ lại truyện nhé!")}
   },
   ok(){if(G.phase==="read")bump(G.R.length-G.ri)},

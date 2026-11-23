@@ -64,8 +64,11 @@ $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns){$("kidIn").value=S.kidName;renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
 $("weakClear").addEventListener("click",()=>{if(window.confirm("Xoá danh sách từ khó của bé?")){clearWeak();toast("Đã xoá")}});
+function saveKid(){S.kidName=$("kidIn").value.replace(/\s+/g," ").trim().slice(0,20);saveS();renderHome();toast(S.kidName?"Đã lưu tên: "+S.kidName:"Đã xoá tên bé");if(S.kidName&&S.voice)speakVi("Chào "+S.kidName+"!")}
+$("kidSave").addEventListener("click",saveKid);
+$("kidIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveKid()}});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
 /* ---------- điều khiển TV (remote) / bàn phím ----------

@@ -25,6 +25,7 @@ function renderHome(){
   updateTotals();
   const den=m=>(m.src==="none"?1:m.src==="stories"?STORIES.length:lessons().length)*3;   // số sao tối đa của mỗi trò
   renderMission();
+  $("heroMsg").textContent=`Chào ${kid()}! Hôm nay mình chơi trò gì nào?`;
   const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${den(m)}</span></button>`;
   $("modes").innerHTML=MODE_GROUPS.map(g=>`<h3 class="grpT">${g[1]}</h3>`+MODES.map((m,i)=>m.grp===g[0]?card(m,i):"").join("")).join("");
 }

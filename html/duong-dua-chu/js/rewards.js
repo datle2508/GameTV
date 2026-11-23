@@ -31,7 +31,7 @@ function renderMission(){
   $("albumCount").textContent=`${rw.st.length}/${STICKERS.length} sticker`;
 }
 function renderAlbum(){
-  $("albumSub").textContent=`Bé có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
+  $("albumSub").textContent=`${S.kidName||"Bé"} có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
   $("stickers").innerHTML=STICKERS.map(s=>rw.st.indexOf(s)>=0?`<span class="sticker">${s}</span>`:'<span class="sticker no">❔</span>').join("");
 }
 

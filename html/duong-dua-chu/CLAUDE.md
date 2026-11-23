@@ -12,7 +12,7 @@ Chỉ sửa mã nguồn trong thư mục này. Sau khi sửa, chạy `python3 bu
 | `css/play.css` | Cảnh đua (xe, đường, sao) và màn chơi (chữ lớn, câu, bóng bay, thanh thời gian, nút micro) |
 | `css/pages.css` | Soạn bài, gara, góc bố mẹ, lớp phủ, media query |
 | `js/data.js` | Bài mẫu `BUILTIN`, `MODES` (14 trò, 4 nhóm `MODE_GROUPS`; thứ tự = trang chủ = phím số; `src` = nguồn bài), `STATEMENTS` (Đúng hay sai), `STORIES` (Truyện tranh), `PICS` (từ → emoji), `ONSETS`, `TONES`, `CARS`, chuỗi SVG |
-| `js/util.js` | `findLesson` (gồm bài đặc biệt `weak`, `bank`, truyện `st…`), `store`, khớp chữ `norm/fold/same`, `parse`, `choicesFor`, cài đặt `S`, bài học và sao (`users`, `prog`) |
+| `js/util.js` | Tên bé `kid()`, lời khen `praise()` (thỉnh thoảng gọi tên, dùng thay `rnd(PRAISE)`), `findLesson` (gồm bài đặc biệt `weak`, `bank`, truyện `st…`), `store`, khớp chữ `norm/fold/same`, `parse`, `choicesFor`, cài đặt `S`, bài học và sao (`users`, `prog`) |
 | `js/viet.js` | Âm tiết tiếng Việt: `syl()` tách âm đầu, vần, dấu; `withTone()` đặt dấu đúng chỗ; `onsetChoices`, `rhymeChoices`, `picOf` |
 | `js/weak.js` | Từ khó: `noteWord(w,ok)` (mọi trò gọi), `weakWords`, `weakLesson` (bài động id `"weak"`), `renderWeak` |
 | `js/rewards.js` | Sticker, nhiệm vụ mỗi ngày, chuỗi ngày (`rw`), nhật ký chơi (`plog`); `rewardFinish` gọi từ `finish()`; `renderMission`, `renderAlbum`, `renderReport` |

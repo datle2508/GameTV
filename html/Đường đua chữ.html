@@ -447,6 +447,14 @@ button:focus:not(:focus-visible){outline:none}
   </div>
   <div class="card">
     <div class="setGroup">
+      <h3>👧 Tên của bé</h3>
+      <div class="btnRow">
+        <input id="kidIn" class="keyin" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Ví dụ: Na, Bin, Su…" aria-label="Tên của bé">
+        <button class="btn" id="kidSave">Lưu tên</button>
+      </div>
+      <p class="note">Máy sẽ gọi tên bé khi chào và khen.</p>
+    </div>
+    <div class="setGroup">
       <h3>🗣 Giọng đọc mẫu</h3>
       <div id="tProv"></div>
 
@@ -644,8 +652,11 @@ const fold=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d
 function lev(a,b){if(Math.abs(a.length-b.length)>1)return 2;let p=[];for(let j=0;j<=b.length;j++)p[j]=j;for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
 
 /* cài đặt bố mẹ */
-const S=Object.assign({quickSec:6,strict:false,sfx:true,voice:true},store.get("settings",{}));
+const S=Object.assign({kidName:"",quickSec:6,strict:false,sfx:true,voice:true},store.get("settings",{}));
 const saveS=()=>store.set("settings",S);
+/* tên bé (bố mẹ đặt ở Góc bố mẹ): kid() → "Na" hoặc "bé"; praise() → lời khen, thỉnh thoảng gọi tên */
+const kid=()=>S.kidName||"bé";
+const praise=()=>{const p=rnd(PRAISE);return S.kidName&&Math.random()<0.5?p.replace(/!$/,"")+", "+S.kidName+"!":p};
 
 /* khớp mềm: đúng hẳn, hoặc chỉ sai dấu thanh (máy hay nghe nhầm), hoặc lệch 1 chữ cái với từ dài.
    Chế độ "chặt" (bố mẹ bật): phải đúng hẳn cả dấu. */
@@ -819,7 +830,7 @@ function renderMission(){
   $("albumCount").textContent=`${rw.st.length}/${STICKERS.length} sticker`;
 }
 function renderAlbum(){
-  $("albumSub").textContent=`Bé có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
+  $("albumSub").textContent=`${S.kidName||"Bé"} có ${rw.st.length}/${STICKERS.length} sticker`+(streakNow()>=2?` · 🔥 ${streakNow()} ngày liên tiếp`:"");
   $("stickers").innerHTML=STICKERS.map(s=>rw.st.indexOf(s)>=0?`<span class="sticker">${s}</span>`:'<span class="sticker no">❔</span>').join("");
 }
 
@@ -884,6 +895,7 @@ function renderHome(){
   updateTotals();
   const den=m=>(m.src==="none"?1:m.src==="stories"?STORIES.length:lessons().length)*3;   // số sao tối đa của mỗi trò
   renderMission();
+  $("heroMsg").textContent=`Chào ${kid()}! Hôm nay mình chơi trò gì nào?`;
   const card=(m,i)=>`<button class="modeCard" data-m="${m.id}" style="--mc:${m.col}" ${i===0?"data-primary":""}><span class="mi">${m.icon}</span><b>${m.name}</b><small>${m.desc}</small><span class="mstars">⭐ ${modeStars(m.id)}/${den(m)}</span></button>`;
   $("modes").innerHTML=MODE_GROUPS.map(g=>`<h3 class="grpT">${g[1]}</h3>`+MODES.map((m,i)=>m.grp===g[0]?card(m,i):"").join("")).join("");
 }
@@ -1078,7 +1090,7 @@ function finish(){
   const after=totalStars(),unl=CARS.filter(c=>c.need>before&&c.need<=after);
   setProgress(1,"🏁");carMove();
   $("rstars").innerHTML=[0,1,2].map(i=>`<svg class="${i<stars?"on":""}" style="animation-delay:${(.25+i*.25).toFixed(2)}s" viewBox="0 0 24 24"><path d="${STAR}"/></svg>`).join("");
-  $("rtitle").textContent=["","Hoàn thành!","Giỏi lắm!","Xuất sắc!"][stars];
+  $("rtitle").textContent=["","Hoàn thành","Giỏi lắm","Xuất sắc"][stars]+(S.kidName?", "+S.kidName:"")+"!";
   $("rinfo").innerHTML=(ms>=1000?`⏱ ${fmt(ms)}`:"")+(after>before?`<br>⭐ +${after-before} sao`:"")+(stars<3?"<br>Chơi lại để được 3 sao nhé!":"");
   let extra=rewardFinish(stars,ms);if(IMPL_().ghostFinish)extra=extra.concat(IMPL_().ghostFinish(ms));   // sticker, nhiệm vụ, xe bóng ma
   $("runlock").innerHTML=(unl.length?`<div class="unlock">🎉 Mở khoá xe mới! ${unl.map(c=>`<span class="gcar sm" style="color:${c.c}">${CAR_SVG}</span>`).join("")}</div>`:"")+extra.map(x=>`<div class="unlock">${x}</div>`).join("");
@@ -1110,7 +1122,7 @@ race:{
   },
   render(anim){const W=G.P.words,i=G.ri;$("stageBody").innerHTML=`<span class="cue">Bé đọc to từ này</span><div class="big${anim?" ok":""}">${i<W.length?esc(W[i].c):"Hoan hô!"}</div>`;renderStrip(i)},
   onRead(){const t=Date.now()-G.t0;while(G.trace.length<G.ri)G.trace.push(t);
-    goodRead();vroom();carMove();say(rnd(PRAISE),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
+    goodRead();vroom();carMove();say(praise(),1);this.render(true);setProgress(G.ri/G.R.length,`${G.ri}/${G.R.length}`);if(G.ri>=G.R.length)finish()},
   ok(){bump(1)},
   sample(){const w=G.P.words[G.ri];return w?w.c:""}
 },
@@ -1130,7 +1142,7 @@ sentence:{
     goodRead();const ss=G.P.sents,n=ss.length,doneS=ss.filter(s=>s.end<=G.ri).length,justDone=doneS>G.doneS;G.doneS=doneS;
     const s=ss[Math.min(doneS,n-1)],part=doneS<n?(G.ri-s.start)/(s.end-s.start):0;
     setProgress((doneS+part)/n,`${doneS}/${n}`);
-    if(justDone){vroom();carMove();say(rnd(PRAISE),1);this.render(doneS-1);if(G.ri>=G.R.length){finish();return}later(()=>this.render(),700)}
+    if(justDone){vroom();carMove();say(praise(),1);this.render(doneS-1);if(G.ri>=G.R.length){finish();return}later(()=>this.render(),700)}
     else{tick();this.render()}
   },
   ok(){const s=G.P.sents[this.cur()];bump(s.end-G.ri)},
@@ -1165,7 +1177,7 @@ quick:{
     if(G.left<=0)this.miss();
   },
   onRead(){
-    if(G.phase!=="go")return;G.phase="hit";G.R=[];G.hits++;goodRead();ding();carMove();say(rnd(PRAISE),1);
+    if(G.phase!=="go")return;G.phase="hit";G.R=[];G.hits++;goodRead();ding();carMove();say(praise(),1);
     const b=$("stageBody").querySelector(".big");if(b)b.classList.add("ok");
     setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);later(()=>this.next(),700);
   },
@@ -1196,7 +1208,7 @@ balloon:{
   tap(i,btn){
     if(G.lock||G.over)return;const w=G.list[G.step];startClock();
     if(G.choices[i]===w){
-      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(rnd(PRAISE),1);noteWord(w,true);
+      G.lock=true;btn.classList.add("pop");ding();G.hits++;carMove();say(praise(),1);noteWord(w,true);
       setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
       later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},850);
     }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng rồi, nghe lại nhé!");later(()=>speakVi(w),450)}
@@ -1242,7 +1254,7 @@ fill:{
   onRead(){
     goodRead();
     if(G.ri>=G.R.length){
-      G.phase="done";this.renderSent();G.R=[];vroom();carMove();say(rnd(PRAISE),1);
+      G.phase="done";this.renderSent();G.R=[];vroom();carMove();say(praise(),1);
       const n=G.list.length;setProgress((G.step+1)/n,`${G.step+1}/${n}`);
       later(()=>{G.step++;if(G.step>=n)finish();else{this.show();focusMain()}},1000);
     }else{tick();this.renderSent()}
@@ -1257,7 +1269,7 @@ fill:{
 
 /* phần chung: chọn đúng / chọn sai */
 function choiceRight(w,next,delay){
-  G.lock=true;ding();carMove();say(rnd(PRAISE),1);noteWord(w,true);G.hits++;
+  G.lock=true;ding();carMove();say(praise(),1);noteWord(w,true);G.hits++;
   setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
   later(()=>{G.lock=false;G.missed=null;G.step++;if(G.step>=G.list.length)finish();else{next();focusMain()}},delay||1000);
 }
@@ -1395,7 +1407,7 @@ IMPL.hunt={
     if(G.lock||G.over)return;const t=G.tiles[i],rh=G.list[G.step];if(t.got)return;startClock();
     if(t.ok){
       t.got=1;btn.classList.add("ok");btn.disabled=true;ding();noteWord(t.w,true);G.found++;
-      if(G.found>=G.need){G.lock=true;carMove();say(rnd(PRAISE),1);G.hits++;setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
+      if(G.found>=G.need){G.lock=true;carMove();say(praise(),1);G.hits++;setProgress(G.hits/G.list.length,`${G.hits}/${G.list.length}`);
         later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},1100);return}
       say(`Đúng rồi! Còn ${G.need-G.found} tiếng nữa.`);
     }else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say(`“${t.w}” không có vần “${rh}” đâu!`)}
@@ -1421,7 +1433,7 @@ IMPL.truefalse={
   },
   pick(i,btn){
     if(G.lock||G.over)return;const it=G.list[G.step];startClock();G.lock=true;
-    if(G.choices[i]===it.ok){btn.classList.add("ok");ding();carMove();say(rnd(PRAISE),1)}
+    if(G.choices[i]===it.ok){btn.classList.add("ok");ding();carMove();say(praise(),1)}
     else{G.errors++;oops();btn.classList.add("wrong");say(it.ok?"Câu này đúng đấy! Bé đọc lại nhé.":"Câu này sai đấy! Bé đọc lại nhé.");speakVi(it.s)}
     setProgress((G.step+1)/G.list.length,`${G.step+1}/${G.list.length}`);
     later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},G.choices[i]===it.ok?1000:2600);
@@ -1461,7 +1473,7 @@ IMPL.order={
       if(G.placed<G.target.length){tick();this.render();focusMain();return}
       const s=G.list[G.step];G.lock=true;
       $("stageBody").innerHTML=`<span class="cue">Câu ${G.step+1}/${G.list.length}</span><div class="sent"><span class="done">${esc(s.text)}</span></div>`;
-      ding();carMove();say(rnd(PRAISE),1);speakVi(s.text);
+      ding();carMove();say(praise(),1);speakVi(s.text);
       setProgress((G.step+1)/G.list.length,`${G.step+1}/${G.list.length}`);
       later(()=>{G.step++;if(G.step>=G.list.length)finish();else{this.show();focusMain()}},1800);
     }else{G.errors++;oops();btn.classList.remove("wrong");void btn.offsetWidth;btn.classList.add("wrong");say("Chưa đúng, từ nào đứng tiếp theo nhỉ?");later(()=>btn.classList.remove("wrong"),500)}
@@ -1490,7 +1502,7 @@ IMPL.story={
   },
   onRead(){
     goodRead();this.render();
-    if(G.ri>=G.R.length){ding();carMove();say(rnd(PRAISE),1);G.R=[];later(()=>this.next(),1000)}else tick();
+    if(G.ri>=G.R.length){ding();carMove();say(praise(),1);G.R=[];later(()=>this.next(),1000)}else tick();
   },
   next(){
     if(G.phase!=="read"||G.over)return;G.R=[];G.step++;carMove();
@@ -1504,7 +1516,7 @@ IMPL.story={
   },
   pick(i,btn){
     if(G.phase!=="q"||G.lock||G.over)return;startClock();
-    if(i===G.st.q[2]){G.lock=true;btn.classList.add("ok");ding();vroom();say(rnd(PRAISE),1);finish()}
+    if(i===G.st.q[2]){G.lock=true;btn.classList.add("ok");ding();vroom();say(praise(),1);finish()}
     else{G.errors++;oops();btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, bé nhớ lại truyện nhé!")}
   },
   ok(){if(G.phase==="read")bump(G.R.length-G.ri)},
@@ -1537,7 +1549,7 @@ IMPL.rain={
     if(G.lock||G.over||!G.rid)return;const w=G.list[G.step];
     if(G.choices[i]===w){
       G.lock=true;btn.classList.add("ok");const d=$("drop"+i);if(d)d.classList.add("caught");
-      ding();carMove();say(rnd(PRAISE),1);noteWord(w,true);this.done(900);
+      ding();carMove();say(praise(),1);noteWord(w,true);this.done(900);
     }else{G.errors++;oops();noteWord(w,false);btn.classList.add("wrong");btn.disabled=true;say("Chưa đúng, nghe lại nhé!");speakVi(w);
       const f=$("stageBody").querySelector("[data-c]:not([disabled])");if(f)f.focus()}
   },
@@ -1578,7 +1590,7 @@ IMPL.memory={
     const a=G.cards[G.open[0]],b=G.cards[G.open[1]];
     if(a.w===b.w&&a.k!==b.k){
       a.done=b.done=true;a.up=b.up=false;G.open=[];G.matched++;
-      ding();carMove();say(rnd(PRAISE),1);speakVi(a.w);noteWord(a.w,true);
+      ding();carMove();say(praise(),1);speakVi(a.w);noteWord(a.w,true);
       setProgress(G.matched/G.n,`${G.matched}/${G.n}`);this.render(i);
       if(G.matched>=G.n)later(()=>finish(),600);
     }else{
@@ -2010,8 +2022,11 @@ $("gVoices").addEventListener("click",e=>{const b=e.target.closest("[data-gv]");
 $("voiceTest").addEventListener("click",()=>speakVi(VOICE_TEST));
 $("pReset").addEventListener("click",()=>{if(window.confirm("Xoá hết sao của bé? Bài tự tạo vẫn được giữ.")){prog={};store.set("prog",prog);updateTotals();applyCar();toast("Đã xoá sao")}});
 $("gateOpts").addEventListener("click",e=>{const b=e.target.closest("[data-g]");if(!b)return;$("gate").classList.remove("show");
-  if(+b.getAttribute("data-g")===gateAns){renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
+  if(+b.getAttribute("data-g")===gateAns){$("kidIn").value=S.kidName;renderSettings();voiceNote();show("parent");renderVoices();renderAI();renderWeak();renderReport();if(mKey&&!mModels)mLoadModels();if(gKey&&!gVoices)gLoadVoices()}else toast("Chưa đúng — góc này dành cho bố mẹ nhé!")});
 $("weakClear").addEventListener("click",()=>{if(window.confirm("Xoá danh sách từ khó của bé?")){clearWeak();toast("Đã xoá")}});
+function saveKid(){S.kidName=$("kidIn").value.replace(/\s+/g," ").trim().slice(0,20);saveS();renderHome();toast(S.kidName?"Đã lưu tên: "+S.kidName:"Đã xoá tên bé");if(S.kidName&&S.voice)speakVi("Chào "+S.kidName+"!")}
+$("kidSave").addEventListener("click",saveKid);
+$("kidIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();saveKid()}});
 $("gateClose").addEventListener("click",()=>$("gate").classList.remove("show"));
 
 /* ---------- điều khiển TV (remote) / bàn phím ----------
