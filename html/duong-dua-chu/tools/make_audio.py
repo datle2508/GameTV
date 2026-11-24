@@ -71,7 +71,10 @@ def phrases():
                                      capture_output=True, text=True, timeout=90).stdout
             m = re.search(r'<pre id="out">(.*?)</pre>', out, re.S)
             if m and m.group(1).strip():
-                return json.loads(html.unescape(m.group(1)))
+                r = json.loads(html.unescape(m.group(1)))
+                if isinstance(r, dict):
+                    sys.exit("Tự kiểm tra trong tools/phrases.html bị lỗi: " + r["error"])
+                return r
         except (FileNotFoundError, subprocess.TimeoutExpired):
             continue
     sys.exit("Không chạy được Edge/Chrome để lấy danh sách câu")
@@ -129,7 +132,9 @@ def main():
     def work(item):
         t, fid = item
         try:
-            (AUDIO / f"{fid}.mp3").write_bytes(synth(t, voice, rate))
+            tmp = AUDIO / f"{fid}.tmp"   # ghi file tạm rồi đổi tên: bị dừng giữa chừng cũng không để lại mp3 cụt
+            tmp.write_bytes(synth(t, voice, rate))
+            tmp.replace(AUDIO / f"{fid}.mp3")
         except Exception as e:   # câu lỗi: bỏ khỏi PACK (game sẽ đọc bằng giọng dự phòng), báo ra để sửa
             failed.append((t, str(e)[:160]))
     done = 0
@@ -142,6 +147,8 @@ def main():
         print("  LỖI:", repr(t), e)
         pack.pop(pack_key(t), None)
     keep = set(pack.values())
+    for f in AUDIO.glob("*.tmp"):   # file tạm của lần chạy bị dừng giữa chừng
+        f.unlink()
     for f in AUDIO.glob("*.mp3"):
         if f.stem not in keep:
             f.unlink()

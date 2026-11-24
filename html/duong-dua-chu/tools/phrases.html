@@ -10,5 +10,9 @@
 <script src="../js/math.js"></script>
 <script src="../js/math2.js"></script>
 <script src="../js/pack.js"></script>
-<script>document.getElementById("out").textContent=JSON.stringify(packPhrases())</script>
+<script>
+/* tự kiểm tra: khoảng số hẹp từng làm numChoices lặp mãi (treo TV) */
+const bad=numChoices(1,0,2,4).length!==3?"numChoices(1,0,2,4) phải ra 3 lựa chọn":"";
+document.getElementById("out").textContent=JSON.stringify(bad?{error:bad}:packPhrases());
+</script>
 </body></html>

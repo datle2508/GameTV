@@ -2278,7 +2278,7 @@ IMPL.pattern={
   show(first){
     const it=G.list[G.step];
     if(it.num){const c=[it.ans+1,it.ans-1,it.ans+(it.show[1]-it.show[0])*2,it.ans+10,it.ans-10].filter((v,k,a)=>v>=0&&v!==it.ans&&a.indexOf(v)===k);G.choices=shuffle([it.ans].concat(shuffle(c).slice(0,2)))}
-    else{const extra=rnd(PAT_E.filter(e=>it.pool.indexOf(e)<0));G.choices=shuffle(it.pool.filter((e,k,a)=>a.indexOf(e)===k).concat(it.pool.length<3?[extra]:[]).slice(0,3));if(G.choices.indexOf(it.ans)<0)G.choices[0]=it.ans}
+    else G.choices=shuffle(it.pool.slice());   // pool luôn là 3 hình khác nhau, có đáp án
     ctrl({listen:"Nghe câu hỏi"});
     const q=it.num?"Số nào tiếp theo?":"Cái gì tiếp theo?";
     $("stageBody").innerHTML=`<span class="cue">Câu ${G.step+1}/${G.list.length} · ${q}</span><div class="seqRow${it.num?"":" emo"}">${it.show.map(v=>`<span>${v}</span>`).join("")}<span class="gap">?</span></div>`+
